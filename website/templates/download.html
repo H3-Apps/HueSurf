@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+
+{% block title %}Download {{ app_name }} - Get the Clean Browser{% endblock %}
+
+{% block description %}Download {{ app_name }} - the lightweight Chromium browser without ads, AI, or bloat. Currently in development.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div style="position: relative; z-index: 2;">
+                    <h1 class="display-4 fw-bold mb-4">
+                        Download {{ app_name }}
+                        <span class="no-bloat-badge">In Development</span>
+                    </h1>
+                    <p class="lead mb-4">
+                        We're working hard to bring you the cleanest browsing experience, but we're not quite ready for prime time yet.
+                    </p>
+                    <p class="mb-4">
+                        {{ app_name }} is still in active development. Some features may change as we perfect the art of bloat-free browsing!
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-body p-5">
+                            <div class="mb-4">
+                                <i class="fas fa-code-branch" style="font-size: 4rem; color: var(--primary-color);"></i>
+                            </div>
+                            <h3 class="fw-bold mb-3">Currently Building</h3>
+                            <p class="text-muted mb-4">
+                                Our team of 3 dudes (and potentially a robot) are crafting something special. No releases ready yet, but you can follow our progress!
+                            </p>
+                            <div class="d-grid gap-2">
+                                <a href="{{ github_url }}" target="_blank" class="btn btn-primary btn-lg">
+                                    <i class="fab fa-github me-2"></i>Follow Development
+                                </a>
+                                <a href="#contribute" class="btn btn-outline-primary">
+                                    <i class="fas fa-code me-2"></i>Help Us Build It
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Current Status -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="h1 fw-bold mb-3">Development Status</h2>
+                <p class="lead text-muted">
+                    Here's what we're working on and what's coming next.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card border-success h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="feature-icon me-3" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-success mb-2">✅ Completed</h5>
+                                <ul class="list-unstyled text-muted">
+                                    <li class="mb-2">• Core Chromium integration</li>
+                                    <li class="mb-2">• Ad blocking foundation</li>
+                                    <li class="mb-2">• Privacy enhancements</li>
+                                    <li class="mb-2">• Initial UI cleanup</li>
+                                    <li class="mb-2">• Project setup & planning</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card border-warning h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="feature-icon me-3" style="width: 50px; height: 50px; font-size: 1.2rem; background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-warning mb-2">🚧 In Progress</h5>
+                                <ul class="list-unstyled text-muted">
+                                    <li class="mb-2">• Building from source</li>
+                                    <li class="mb-2">• Binary releases</li>
+                                    <li class="mb-2">• Cross-platform support</li>
+                                    <li class="mb-2">• Advanced blocking features</li>
+                                    <li class="mb-2">• Performance optimizations</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- System Requirements -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="h1 fw-bold mb-3">System Requirements</h2>
+                <p class="lead text-muted">
+                    When {{ app_name }} is ready, here's what you'll need to run it smoothly.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fab fa-windows" style="font-size: 3rem; color: #0078d4;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">Windows</h5>
+                        <ul class="list-unstyled text-muted text-start">
+                            <li class="mb-2">• Windows 10 or later</li>
+                            <li class="mb-2">• 4GB RAM minimum</li>
+                            <li class="mb-2">• 1GB free disk space</li>
+                            <li class="mb-2">• Intel/AMD 64-bit processor</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fab fa-apple" style="font-size: 3rem; color: #000;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">macOS</h5>
+                        <ul class="list-unstyled text-muted text-start">
+                            <li class="mb-2">• macOS 10.15 or later</li>
+                            <li class="mb-2">• 4GB RAM minimum</li>
+                            <li class="mb-2">• 1GB free disk space</li>
+                            <li class="mb-2">• Intel or Apple Silicon</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fab fa-linux" style="font-size: 3rem; color: #fcc624;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">Linux</h5>
+                        <ul class="list-unstyled text-muted text-start">
+                            <li class="mb-2">• Ubuntu 18.04+ / equiv</li>
+                            <li class="mb-2">• 4GB RAM minimum</li>
+                            <li class="mb-2">• 1GB free disk space</li>
+                            <li class="mb-2">• x64 architecture</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How to Get Involved -->
+<section id="contribute" class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="h1 fw-bold mb-3">Help Us Build {{ app_name }}</h2>
+                <p class="lead text-muted">
+                    We welcome PRs, ideas, and memes (no labubu syscall 🥲). Here's how you can get involved while we work towards our first release.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="feature-card text-center h-100">
+                    <div class="feature-icon">
+                        <i class="fab fa-github"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Contribute Code</h5>
+                    <p class="text-muted mb-4">
+                        Fork our repository, pick an issue, and help us build the cleanest browser ever. Every line of code counts!
+                    </p>
+                    <a href="{{ github_url }}" target="_blank" class="btn btn-outline-primary">
+                        <i class="fab fa-github me-1"></i>View Repository
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="feature-card text-center h-100">
+                    <div class="feature-icon">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Report Issues</h5>
+                    <p class="text-muted mb-4">
+                        Found a bug or have a feature request? Let us know! Your feedback helps us build something better.
+                    </p>
+                    <a href="{{ github_url }}/issues" target="_blank" class="btn btn-outline-primary">
+                        <i class="fas fa-exclamation-circle me-1"></i>Report Issues
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="feature-card text-center h-100">
+                    <div class="feature-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Support the Project</h5>
+                    <p class="text-muted mb-4">
+                        If you vibe with our mission, consider supporting us! Every donation helps keep the lights on.
+                    </p>
+                    <a href="{{ url_for('donate') }}" class="btn btn-donate">
+                        <i class="fas fa-heart me-1"></i>Donate
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Build Instructions Preview -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="text-center mb-5">
+                    <h2 class="h1 fw-bold mb-3">Building from Source</h2>
+                    <p class="lead text-muted">
+                        For the brave developers who want to build {{ app_name }} themselves (when it's ready).
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-tools" style="font-size: 2rem; color: var(--primary-color);"></i>
+                            <h5 class="fw-bold mt-3">Coming Soon</h5>
+                        </div>
+                        <p class="text-muted text-center mb-4">
+                            Build instructions will be available once our codebase is ready for compilation.
+                            We're working on making the build process as simple as possible.
+                        </p>
+                        <div class="bg-light p-3 rounded mono text-center">
+                            <small class="text-muted">
+                                # Coming soon:<br>
+                                $ git clone {{ github_url }}.git<br>
+                                $ cd HueSurf<br>
+                                $ ./build.sh<br>
+                                <br>
+                                <em>Stay tuned for detailed instructions!</em>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter/Updates -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 mx-auto text-center">
+                <h2 class="fw-bold mb-4">Stay Updated</h2>
+                <p class="text-muted mb-4">
+                    Want to know when {{ app_name }} is ready for download? Follow us on GitHub and watch our repository for the latest updates.
+                </p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                    <a href="{{ github_url }}" target="_blank" class="btn btn-primary btn-lg">
+                        <i class="fab fa-github me-2"></i>Watch on GitHub
+                    </a>
+                    <a href="{{ url_for('about') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-users me-2"></i>Meet the Team
+                    </a>
+                </div>
+                <div class="mt-4">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        No spam, no marketing emails - just GitHub notifications when we ship!
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate cards on scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    });
+
+    document.querySelectorAll('.card, .feature-card').forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(20px)';
+        element.style.transition = `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`;
+        observer.observe(element);
+    });
+
+    // Add some personality to the main download button
+    const downloadButtons = document.querySelectorAll('a[href*="github"]');
+    downloadButtons.forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.innerHTML = this.innerHTML.replace('Follow Development', 'Join the Revolution');
+        });
+        btn.addEventListener('mouseleave', function() {
+            this.innerHTML = this.innerHTML.replace('Join the Revolution', 'Follow Development');
+        });
+    });
+});
+</script>
+{% endblock %}

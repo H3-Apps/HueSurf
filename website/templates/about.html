@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}About {{ app_name }} - Meet the Team{% endblock %}
+
+{% block description %}Learn about the team behind {{ app_name }} and why we decided to build a cleaner, bloat-free Chromium browser.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div style="position: relative; z-index: 2;">
+                    <h1 class="display-4 fw-bold mb-4">
+                        About {{ app_name }}
+                        <span class="no-bloat-badge">Made by Humans</span>
+                    </h1>
+                    <p class="lead mb-4">
+                        We're just 3 dudes who got tired of bloated browsers and decided to do something about it.
+                    </p>
+                    <p class="mb-4">
+                        Created by 3 dudes (and maybe a robot if Javier gets crazy!), we want this to be small but we are open to donations!!!
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <div class="row g-3">
+                        {% for member in team_members %}
+                        <div class="col-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body text-center p-3">
+                                    <div class="mb-2">
+                                        <i class="fas fa-user-circle" style="font-size: 2.5rem; color: var(--primary-color);"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-1 mono">{{ member }}</h6>
+                                    <small class="text-muted">Developer</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-white">
+                            <i class="fas fa-robot me-1"></i>+ potentially a robot if Javier goes insane 😜
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Story -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="text-center mb-5">
+                    <h2 class="h1 fw-bold mb-3">Our Story</h2>
+                    <p class="lead text-muted">
+                        How three developers decided to tackle the browser bloat problem.
+                    </p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="feature-icon me-3" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                                        <i class="fas fa-lightbulb"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">The Problem</h5>
+                                </div>
+                                <p class="text-muted">
+                                    We were fed up with browsers that come loaded with ads, AI features we never asked for, sponsor content, and enough bloat to sink a ship. Every update seemed to add more stuff we didn't want.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="feature-icon me-3" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                                        <i class="fas fa-rocket"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">The Solution</h5>
+                                </div>
+                                <p class="text-muted">
+                                    So we decided to build our own. Take Chromium (the good parts), strip out all the annoying stuff, and create something that just works. Simple as that.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="h1 fw-bold mb-3">Meet the Team</h2>
+                <p class="lead text-muted">
+                    The humans (and potentially AI) behind {{ app_name }}.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for member in team_members %}
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-user-circle" style="font-size: 4rem; color: var(--primary-color);"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2 mono">{{ member }}</h4>
+                        <p class="text-primary mb-3">Core Developer</p>
+                        <p class="text-muted small">
+                            {% if member == "H3" %}
+                                One of the founding members who believes in clean, simple software that just works.
+                            {% elif member == "vexalous" %}
+                                Passionate about privacy and performance, fighting the good fight against browser bloat.
+                            {% else %}
+                                Bringing creativity and unique perspectives to the project (and yes, that's really their name).
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-lg-4 mx-auto">
+                <div class="card border-warning h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-robot" style="font-size: 4rem; color: #ffc107;"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2">Javier's Robot</h4>
+                        <p class="text-warning mb-3">Potential AI Assistant</p>
+                        <p class="text-muted small">
+                            Status: <strong>Contained</strong><br>
+                            If this becomes active, please contact us immediately. We will spank Javier so hard his butt will explode of being hurt so hard.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Project Philosophy -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="text-center mb-5">
+                    <h2 class="h1 fw-bold mb-3">Our Philosophy</h2>
+                    <p class="lead text-muted">
+                        What drives us to build {{ app_name }}.
+                    </p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="feature-card text-center h-100">
+                            <div class="feature-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Made with 💚</h5>
+                            <p class="text-muted">
+                                We genuinely care about creating something useful. No corporate agenda, no hidden motives - just three developers who want a better browser.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="feature-card text-center h-100">
+                            <div class="feature-icon">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">MIT Licensed</h5>
+                            <p class="text-muted">
+                                "Do what you want, just don't add ads. Or sell it with little to no difference." That's our license philosophy in a nutshell.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="feature-card text-center h-100">
+                            <div class="feature-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Community Driven</h5>
+                            <p class="text-muted">
+                                We welcome PRs, ideas, and memes (no labubu syscall 🥲). The best software is built by and for the community.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="feature-card text-center h-100">
+                            <div class="feature-icon">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Donation Friendly</h5>
+                            <p class="text-muted">
+                                We're open to donations! If you vibe with us, show some love. Every contribution helps keep the project alive and bloat-free.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Fun Facts -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="text-center mb-5">
+                    <h2 class="h1 fw-bold mb-3">Fun Facts</h2>
+                    <p class="lead text-muted">
+                        Some random tidbits about {{ app_name }} and the team.
+                    </p>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-0 bg-primary bg-opacity-10 h-100 text-center">
+                            <div class="card-body p-3">
+                                <div class="display-6 fw-bold text-primary">3</div>
+                                <small class="text-muted">Developers</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-0 bg-success bg-opacity-10 h-100 text-center">
+                            <div class="card-body p-3">
+                                <div class="display-6 fw-bold text-success">0</div>
+                                <small class="text-muted">Ads</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-0 bg-warning bg-opacity-10 h-100 text-center">
+                            <div class="card-body p-3">
+                                <div class="display-6 fw-bold text-warning">1</div>
+                                <small class="text-muted">Maybe Robot</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-0 bg-danger bg-opacity-10 h-100 text-center">
+                            <div class="card-body p-3">
+                                <div class="display-6 fw-bold text-danger">∞</div>
+                                <small class="text-muted">Bloat Removed</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-2">Project Goal</h6>
+                            <p class="text-muted mb-0">
+                                "We want this to be small but we are open to donations!!!" - The official {{ app_name }} mission statement
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact/Support -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="fw-bold mb-4">Get in Touch</h2>
+                <p class="lead mb-4">
+                    Want to chat, contribute, or just say hi? We're always open to connecting with fellow browser enthusiasts.
+                </p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                    <a href="{{ github_url }}" target="_blank" class="btn btn-primary btn-lg">
+                        <i class="fab fa-github me-2"></i>GitHub Discussions
+                    </a>
+                    <a href="{{ url_for('support') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-life-ring me-2"></i>Get Support
+                    </a>
+                    <a href="{{ url_for('donate') }}" class="btn btn-donate btn-lg">
+                        <i class="fas fa-heart me-2"></i>Support Us
+                    </a>
+                </div>
+                <div class="mt-4">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        We respect your privacy - no tracking, no analytics, just good old-fashioned communication.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate elements on scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    });
+
+    // Animate cards
+    document.querySelectorAll('.card, .feature-card').forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(20px)';
+        element.style.transition = `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`;
+        observer.observe(element);
+    });
+
+    // Add fun interaction to robot card
+    const robotCard = document.querySelector('.card.border-warning');
+    if (robotCard) {
+        robotCard.addEventListener('click', function() {
+            const robot = this.querySelector('.fa-robot');
+            robot.style.animation = 'shake 0.5s';
+            setTimeout(() => {
+                robot.style.animation = '';
+            }, 500);
+        });
+    }
+});
+</script>
+
+<style>
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+</style>
+{% endblock %}
