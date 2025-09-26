@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+
+{% block title %}Features - {{ app_name }}{% endblock %}
+
+{% block description %}Discover what makes {{ app_name }} the cleanest Chromium browser - no ads, no AI, no bloat, just pure browsing.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div style="position: relative; z-index: 2;">
+                    <h1 class="display-4 fw-bold mb-4">
+                        Features That Matter
+                        <span class="no-bloat-badge">Zero Bloat</span>
+                    </h1>
+                    <p class="lead mb-4">
+                        We stripped out everything you hate about modern browsers and kept everything you love about the web.
+                    </p>
+                    <p class="mb-4">
+                        Built on Chromium but designed by humans who actually use browsers, not marketing departments.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <div class="browser-window">
+                        <div class="browser-header">
+                            <div class="browser-dots">
+                                <div class="browser-dot red"></div>
+                                <div class="browser-dot yellow"></div>
+                                <div class="browser-dot green"></div>
+                            </div>
+                            <div class="browser-url">
+                                <i class="fas fa-shield-alt me-2"></i>Clean browsing enabled
+                            </div>
+                        </div>
+                        <div class="p-4" style="background: white; min-height: 150px; display: flex; align-items: center; justify-content: center;">
+                            <div class="text-center">
+                                <div class="row g-2">
+                                    <div class="col-4">
+                                        <div class="bg-danger rounded-2 d-flex align-items-center justify-content-center" style="height: 40px; position: relative;">
+                                            <span style="position: absolute; top: -5px; right: -5px; background: #ff6b6b; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center;">✕</span>
+                                            <small class="text-white">AD</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-8">
+                                        <div class="bg-light rounded-2 d-flex align-items-center justify-content-center" style="height: 40px;">
+                                            <small class="text-muted">Your Content</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <small class="text-muted mt-2 d-block">Ads blocked, content preserved</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Features Grid -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row g-5">
+            <!-- No Ads Feature -->
+            <div class="col-lg-6">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">
+                        <i class="fas fa-ad"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">No Ads, No Sponsors</h3>
+                    <p class="text-muted mb-4">
+                        Surf distraction-free. We've completely removed all advertising frameworks, sponsor integrations, and promotional content systems that plague other browsers.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Built-in ad blocking</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>No sponsored bookmarks</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>No promoted content</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Clean new tab page</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- No AI Feature -->
+            <div class="col-lg-6">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">No AI</h3>
+                    <p class="text-muted mb-4">
+                        Your data stays yours, no weird bots lurking. We believe browsing should be private and AI-free unless you explicitly choose otherwise.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>No AI assistants</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>No data collection for ML</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>No predictive features</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Human-focused design</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Lightweight Feature -->
+            <div class="col-lg-6">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">
+                        <i class="fas fa-feather-alt"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">Lightweight</h3>
+                    <p class="text-muted mb-4">
+                        Minimal footprint, quick to start, easy on your RAM. We've optimized every aspect for performance without sacrificing functionality.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Fast startup time</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Low memory usage</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Streamlined codebase</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Efficient resource management</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Open Source Feature -->
+            <div class="col-lg-6">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">
+                        <i class="fas fa-code-branch"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">Open Source</h3>
+                    <p class="text-muted mb-4">
+                        Fork it, star it, make it your own. Complete transparency in how your browser works, with community-driven development.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>MIT Licensed</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Community contributions welcome</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Full source code available</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Transparent development</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Technical Features -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="h1 fw-bold mb-3">Under the Hood</h2>
+                <p class="lead text-muted">
+                    Built on proven Chromium foundation with careful modifications for privacy and performance.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="feature-icon mb-3">
+                        <i class="fab fa-chrome"></i>
+                    </div>
+                    <h6 class="fw-bold">Chromium Base</h6>
+                    <p class="text-muted small">Latest Chromium engine for compatibility</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h6 class="fw-bold">Privacy First</h6>
+                    <p class="text-muted small">Enhanced privacy controls built-in</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h6 class="fw-bold">Performance</h6>
+                    <p class="text-muted small">Optimized for speed and efficiency</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h6 class="fw-bold">Extensions</h6>
+                    <p class="text-muted small">Chrome Web Store compatibility</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- What's Missing (Intentionally) -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="text-center mb-5">
+                    <h2 class="h1 fw-bold mb-3">What We Left Out</h2>
+                    <p class="lead text-muted">
+                        These "features" didn't make the cut for good reasons.
+                    </p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card border-danger h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-ban text-danger mb-3" style="font-size: 2rem;"></i>
+                                <h6 class="fw-bold">Telemetry & Analytics</h6>
+                                <p class="text-muted small mb-0">No usage tracking, no data collection, no phone-home features</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card border-danger h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-ban text-danger mb-3" style="font-size: 2rem;"></i>
+                                <h6 class="fw-bold">Crypto & Web3</h6>
+                                <p class="text-muted small mb-0">No cryptocurrency wallets or blockchain integrations</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card border-danger h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-ban text-danger mb-3" style="font-size: 2rem;"></i>
+                                <h6 class="fw-bold">Social Media Integration</h6>
+                                <p class="text-muted small mb-0">No built-in social sharing or platform connections</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card border-danger h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-ban text-danger mb-3" style="font-size: 2rem;"></i>
+                                <h6 class="fw-bold">Bloated Services</h6>
+                                <p class="text-muted small mb-0">No unnecessary cloud syncing or account requirements</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Feature Comparison -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="text-center mb-5">
+                    <h2 class="h1 fw-bold mb-3">How We Compare</h2>
+                    <p class="lead text-muted">
+                        See how {{ app_name }} stacks up against other browsers.
+                    </p>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Feature</th>
+                                <th class="text-center">{{ app_name }}</th>
+                                <th class="text-center">Chrome</th>
+                                <th class="text-center">Edge</th>
+                                <th class="text-center">Firefox</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>No Ads</strong></td>
+                                <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td><strong>No AI</strong></td>
+                                <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                <td class="text-center"><i class="fas fa-minus text-warning"></i></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Privacy First</strong></td>
+                                <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lightweight</strong></td>
+                                <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                <td class="text-center"><i class="fas fa-minus text-warning"></i></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Open Source</strong></td>
+                                <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                <td class="text-center"><i class="fas fa-minus text-warning"></i></td>
+                                <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Extension Support</strong></td>
+                                <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="fw-bold mb-4">Ready to Browse Clean?</h2>
+                <p class="lead mb-4">
+                    Join the movement for a cleaner, faster, and more private web browsing experience.
+                </p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                    <a href="{{ github_url }}" target="_blank" class="btn btn-primary btn-lg">
+                        <i class="fab fa-github me-2"></i>Star on GitHub
+                    </a>
+                    <a href="{{ url_for('download') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-download me-2"></i>Get {{ app_name }}
+                    </a>
+                    <a href="{{ url_for('donate') }}" class="btn btn-donate btn-lg">
+                        <i class="fas fa-heart me-2"></i>Support the Project
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate elements on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Animate feature cards
+    document.querySelectorAll('.feature-card, .card').forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        element.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+        observer.observe(element);
+    });
+
+    // Animate table rows
+    document.querySelectorAll('tbody tr').forEach((row, index) => {
+        row.style.opacity = '0';
+        row.style.transform = 'translateX(-20px)';
+        row.style.transition = `opacity 0.4s ease ${index * 0.1}s, transform 0.4s ease ${index * 0.1}s`;
+        observer.observe(row);
+    });
+});
+</script>
+{% endblock %}
