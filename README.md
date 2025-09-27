@@ -1,6 +1,5 @@
 <!-- DONT MODIFY THIS FILE -->
 # HueSurf
----
 
 ##  What is HueSurf?
 
@@ -20,7 +19,7 @@ HueSurf is a minimal, fast, and privacy-focused browser built on Chromium. We st
 > **Note:** HueSurf is in active development. Some features may change!  
 > No releases are ready yet.
 
-### Building from Source
+## Building from Source
 
 HueSurf uses a **patch-based build system** that downloads Chromium source and applies HueSurf modifications during build time. This keeps our repository lightweight while enabling full customization.
 
