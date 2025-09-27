@@ -1,9 +1,5 @@
 <!-- DONT MODIFY THIS FILE -->
 # HueSurf
-
-> A lightweight Chromium-based browser without any ADs, AI, Sponsors, or bloat.  
-> Created by 3 dudes, we want this to be small but we are open to donations!!!
-
 ---
 
 ##  What is HueSurf?
