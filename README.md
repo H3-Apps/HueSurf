@@ -15,7 +15,7 @@ HueSurf is a minimal, fast, and privacy-focused browser built on Chromium. We st
 - 🤖 **No AI** – Your data stays yours, no weird bots lurking.
 - 🪶 **Lightweight** – Minimal footprint, quick to start, easy on your systems RAM.
 - 🛠️ **Open Source** – Fork it, star it, and make it your own.
-- 💸 **Donation Friendly** – If you vibe with us, show some love!
+- 💸 **Donation Friendly** – If you vibe with us, show some love! 
 
 ## 💸 Support & Donations
 
