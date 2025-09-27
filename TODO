@@ -1,3 +1,21 @@
-// TODO: Add option to download wallpapers in .zip packs from the h3 server (saves in local data) And add more wallpapers lmao
+// DONE: Add option to download wallpapers in .zip packs from the h3 server (saves in local data) And add more wallpapers lmao
+// ✅ Implemented complete wallpaper pack system with:
+//    - API endpoints for downloading wallpaper packs as .zip files
+//    - Support for shuffle on new tab feature
+//    - Metadata system for wallpaper packs (pack_info.json)
+//    - Web interface at /wallpapers for managing and downloading packs
+//    - Two wallpaper packs ready: Indiana (4 wallpapers) and Star (11 wallpapers)
+//    - Browser patch for wallpaper management (002-wallpaper-manager.patch)
+//    - Random wallpaper API for shuffle functionality
+//
+//    NEW: Python packer script for static website distribution
+//    - scripts/pack_wallpapers.py - Automated wallpaper packaging tool
+//    - scripts/pack.sh - Easy-to-use shell wrapper with dependency checks
+//    - Converts assets/Wallpapers/ to website/static/wallpapers/
+//    - Creates ZIP files, preview thumbnails, and manifest.json
+//    - Web-based repack trigger via /api/wallpapers/repack
+//    - Statistics tracking and verbose logging
+//    - 208.7 MB total packed (Indiana: 163.6 MB, Star: 45.1 MB)
+
 // TODO: Add chromium source code!
-// TODO: Make a build script for dummies (h3nry) 
+// TODO: Make a build script for dummies (h3)

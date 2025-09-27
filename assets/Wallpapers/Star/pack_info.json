@@ -1,0 +1,93 @@
+{
+  "pack_name": "Star",
+  "version": "1.0.0",
+  "author": "HueSurf Team",
+  "description": "A icon of a star.",
+  "category": "Space",
+  "created_date": "2025-01-01",
+  "shuffle_enabled": true,
+  "shuffle_on_new_tab": true,
+  "wallpapers": [
+    {
+      "filename": "black.png",
+      "name": "Black Star",
+      "description": "Black backround with a star",
+      "tags": ["black", "dark", "stars", "space"]
+    },
+    {
+      "filename": "blue.png",
+      "name": "Blue Star",
+      "description": "Blue background with a star",
+      "tags": ["blue", "stars", "light", "space"]
+    },
+    {
+      "filename": "green.png",
+      "name": "Green Star",
+      "description": "Green backround with a star",
+      "tags": ["green", "stars", "space", "cosmos"]
+    },
+    {
+      "filename": "near.png",
+      "name": "Near Star",
+      "description": "Close up of star",
+      "tags": ["close", "stars", "detail", "space"]
+    },
+    {
+      "filename": "oled.png",
+      "name": "OLED Star",
+      "description": "OLED-optimized star",
+      "tags": ["oled", "black", "stars", "dark"]
+    },
+    {
+      "filename": "orange.png",
+      "name": "Orange Star",
+      "description": "Orange background with a star",
+      "tags": ["orange", "warm", "stars", "space"]
+    },
+    {
+      "filename": "pink.png",
+      "name": "Pink Star",
+      "description": "Pink background with a star",
+      "tags": ["pink", "stars", "cosmic", "space"]
+    },
+    {
+      "filename": "purple.png",
+      "name": "Purple Star",
+      "description": "Purple background with a star",
+      "tags": ["purple", "stars", "cosmic", "space"]
+    },
+    {
+      "filename": "red.png",
+      "name": "Red Star",
+      "description": "Red background with a star",
+      "tags": ["red", "stars", "cosmic", "space"]
+    },
+    {
+      "filename": "white.png",
+      "name": "White Star",
+      "description": "White backround with a star",
+      "tags": ["white", "light", "stars", "space"]
+    },
+    {
+      "filename": "yellow.png",
+      "name": "Yellow Star",
+      "description": "Yellow background with a star",
+      "tags": ["yellow", "bright", "stars", "space"]
+    }
+  ],
+  "colors": {
+    "primary": "#1A1A2E",
+    "secondary": "#16213E",
+    "accent": "#E94560"
+  },
+  "recommended_for": ["desktop", "tablet", "mobile"],
+  "min_resolution": "1920x1080",
+  "license": "MIT",
+  "settings": {
+    "shuffle_interval": "new_tab",
+    "transition_effect": "fade",
+    "transition_duration": 500,
+    "allow_user_shuffle": true,
+    "remember_last_wallpaper": false
+  }
+}

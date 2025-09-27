@@ -1,0 +1,14 @@
+# Requirements for HueSurf Wallpaper Packer Script
+# Install with: pip install -r requirements_packer.txt
+
+# Image processing library for creating thumbnails and previews
+Pillow>=10.0.0
+
+# Optional: Progress bars for better user experience
+tqdm>=4.65.0
+
+# Optional: Better file handling and validation
+pathvalidate>=3.0.0
+
+# Optional: Enhanced logging with colors
+colorlog>=6.7.0
