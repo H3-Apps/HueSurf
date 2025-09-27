@@ -1,0 +1,109 @@
+# HueSurf Custom Build Arguments
+# Additional configuration for building HueSurf browser
+# Made by 3 dudes who got tired of bloated browsers
+
+# HueSurf branding and identity
+huesurf_branding = true
+use_official_google_api_keys = false
+google_api_key = ""
+google_default_client_id = ""
+google_default_client_secret = ""
+
+# Privacy and anti-bloat settings
+enable_google_now_integration = false
+enable_background_mode = false
+enable_background_fetch = false
+enable_one_click_signin = false
+enable_supervised_users = false
+safe_browsing_mode = 0
+enable_reporting = false
+enable_crash_reporting = false
+enable_usage_stats = false
+
+# Remove Google services
+enable_google_now = false
+enable_hotwording = false
+enable_hangout_services_extension = false
+enable_webrtc_remote_desktop = false
+enable_remoting = false
+enable_google_now_integration = false
+
+# Disable AI and ML features
+enable_ml_internal = false
+enable_machine_learning = false
+enable_on_device_translation = false
+enable_translate = true  # Keep basic translate, but no AI
+build_with_tflite_lib = false
+
+# Remove sponsored and promotional content
+enable_plugins = true
+enable_extensions = true
+enable_nacl = false
+enable_pnacl = false
+
+# Performance and lightweight optimizations
+optimize_webui = true
+use_jumbo_build = true
+use_thin_lto = true
+use_lld = true
+enable_iterator_debugging = false
+
+# Remove unnecessary features
+enable_pdf = true  # Keep PDF support as it's useful
+enable_printing = true
+enable_basic_printing = true
+enable_print_preview = true
+enable_service_discovery = false
+enable_wifi_bootstrapping = false
+enable_mdns = false
+
+# Network and connectivity
+enable_websockets = true
+enable_webrtc = true
+rtc_use_h264 = true
+
+# Media features (keep essential ones)
+proprietary_codecs = true
+ffmpeg_branding = "Chrome"
+enable_widevine = false  # No DRM bloat
+
+# Developer and debugging
+dcheck_always_on = false
+enable_profiling = false
+is_component_ffmpeg = false
+
+# Platform specific tweaks
+treat_warnings_as_errors = false
+use_custom_libcxx = true
+
+# HueSurf specific features
+enable_huesurf_adblock = true
+enable_huesurf_privacy_mode = true
+huesurf_default_search_provider = "duckduckgo"
+
+# Remove Chrome sync and account features
+enable_supervised_users = false
+enable_configuration_policy = true
+enable_extensions_core = true
+
+# Networking
+enable_captive_portal_detection = false
+enable_domain_reliability = false
+
+# Remove Google Update and auto-update bloat
+enable_google_update_integration = false
+enable_update_notifications = false
+
+# Keep useful browser features
+enable_spellcheck = true
+enable_themes = true
+enable_autofill = true
+enable_password_manager = true
+enable_session_service = true
+
+# Security (keep the good stuff)
+enable_plugins_discovery = false
+enable_plugin_installation = false
+use_nss_certs = true
+
+# HueSurf motto: "No ads, no AI, no bloat, no problem!"
