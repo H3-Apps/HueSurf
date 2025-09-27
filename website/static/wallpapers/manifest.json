@@ -1,0 +1,280 @@
+{
+  "version": "1.0.0",
+  "generated": "2025-09-26T23:20:39.101213",
+  "total_packs": 2,
+  "total_wallpapers": 15,
+  "total_size_mb": 208.75,
+  "packs": [
+    {
+      "pack_name": "Indiana",
+      "version": "1.0.0",
+      "author": "HueSurf Team",
+      "description": "Indiana-themed wallpapers featuring scenic landscapes and urban views",
+      "category": "Landscape",
+      "created_date": "2025-01-01",
+      "shuffle_enabled": true,
+      "shuffle_on_new_tab": true,
+      "wallpapers": [
+        {
+          "filename": "mount tree.png",
+          "name": "Mount Tree",
+          "description": "Scenic mountain view with tree silhouette",
+          "tags": [
+            "mountain",
+            "tree",
+            "nature",
+            "landscape",
+            "indiana"
+          ]
+        },
+        {
+          "filename": "roads.png",
+          "name": "Indiana Roads",
+          "description": "Open roads stretching across Indiana landscape",
+          "tags": [
+            "road",
+            "highway",
+            "travel",
+            "landscape",
+            "indiana"
+          ]
+        },
+        {
+          "filename": "rush.png",
+          "name": "Rush Hour",
+          "description": "Urban rush hour scene in Indiana",
+          "tags": [
+            "urban",
+            "city",
+            "motion",
+            "dynamic",
+            "indiana"
+          ]
+        },
+        {
+          "filename": "tracks.png",
+          "name": "Railroad Tracks",
+          "description": "Railroad tracks through Indiana countryside",
+          "tags": [
+            "railroad",
+            "tracks",
+            "industrial",
+            "transportation",
+            "indiana"
+          ]
+        }
+      ],
+      "colors": {
+        "primary": "#E86F51",
+        "secondary": "#4A90E2",
+        "accent": "#50C878"
+      },
+      "recommended_for": [
+        "desktop",
+        "tablet"
+      ],
+      "min_resolution": "1920x1080",
+      "license": "MIT",
+      "settings": {
+        "shuffle_interval": "new_tab",
+        "transition_effect": "fade",
+        "transition_duration": 500,
+        "allow_user_shuffle": true,
+        "remember_last_wallpaper": false
+      },
+      "id": "indiana",
+      "name": "Indiana",
+      "count": 4,
+      "size_bytes": 171562192,
+      "size_mb": 163.61,
+      "download_url": "/static/wallpapers/packs/indiana.zip",
+      "preview_url": "/static/wallpapers/previews/indiana.jpg",
+      "hash": "f1487327e61c7073ef9fc8340d324209576be9656ee3679dec6cb4f91d34d2b2",
+      "packed_date": "2025-09-26T23:20:32.809200"
+    },
+    {
+      "pack_name": "Star",
+      "version": "1.0.0",
+      "author": "HueSurf Team",
+      "description": "Stellar-themed wallpapers with various color schemes",
+      "category": "Space",
+      "created_date": "2025-01-01",
+      "shuffle_enabled": true,
+      "shuffle_on_new_tab": true,
+      "wallpapers": [
+        {
+          "filename": "black.png",
+          "name": "Black Star",
+          "description": "Dark stellar background with stars",
+          "tags": [
+            "black",
+            "dark",
+            "stars",
+            "space"
+          ]
+        },
+        {
+          "filename": "blue.png",
+          "name": "Blue Star",
+          "description": "Blue-themed stellar wallpaper",
+          "tags": [
+            "blue",
+            "stars",
+            "cosmic",
+            "space"
+          ]
+        },
+        {
+          "filename": "green.png",
+          "name": "Green Star",
+          "description": "Green cosmic stellar background",
+          "tags": [
+            "green",
+            "stars",
+            "space",
+            "cosmos"
+          ]
+        },
+        {
+          "filename": "near.png",
+          "name": "Near Star",
+          "description": "Close-up view of stellar formations",
+          "tags": [
+            "close",
+            "stars",
+            "detail",
+            "space"
+          ]
+        },
+        {
+          "filename": "oled.png",
+          "name": "OLED Star",
+          "description": "OLED-optimized dark stellar wallpaper",
+          "tags": [
+            "oled",
+            "black",
+            "stars",
+            "dark"
+          ]
+        },
+        {
+          "filename": "orange.png",
+          "name": "Orange Star",
+          "description": "Orange-themed stellar background",
+          "tags": [
+            "orange",
+            "warm",
+            "stars",
+            "space"
+          ]
+        },
+        {
+          "filename": "pink.png",
+          "name": "Pink Star",
+          "description": "Pink cosmic stellar wallpaper",
+          "tags": [
+            "pink",
+            "stars",
+            "cosmic",
+            "space"
+          ]
+        },
+        {
+          "filename": "purple.png",
+          "name": "Purple Star",
+          "description": "Purple-themed stellar background",
+          "tags": [
+            "purple",
+            "stars",
+            "cosmic",
+            "space"
+          ]
+        },
+        {
+          "filename": "red.png",
+          "name": "Red Star",
+          "description": "Red stellar wallpaper",
+          "tags": [
+            "red",
+            "stars",
+            "cosmic",
+            "space"
+          ]
+        },
+        {
+          "filename": "white.png",
+          "name": "White Star",
+          "description": "Light stellar background with stars",
+          "tags": [
+            "white",
+            "light",
+            "stars",
+            "space"
+          ]
+        },
+        {
+          "filename": "yellow.png",
+          "name": "Yellow Star",
+          "description": "Yellow-themed stellar wallpaper",
+          "tags": [
+            "yellow",
+            "bright",
+            "stars",
+            "space"
+          ]
+        }
+      ],
+      "colors": {
+        "primary": "#1A1A2E",
+        "secondary": "#16213E",
+        "accent": "#E94560"
+      },
+      "recommended_for": [
+        "desktop",
+        "tablet",
+        "mobile"
+      ],
+      "min_resolution": "1920x1080",
+      "license": "MIT",
+      "settings": {
+        "shuffle_interval": "new_tab",
+        "transition_effect": "fade",
+        "transition_duration": 500,
+        "allow_user_shuffle": true,
+        "remember_last_wallpaper": false
+      },
+      "id": "star",
+      "name": "Star",
+      "count": 11,
+      "size_bytes": 47326202,
+      "size_mb": 45.13,
+      "download_url": "/static/wallpapers/packs/star.zip",
+      "preview_url": "/static/wallpapers/previews/star.jpg",
+      "hash": "fbb43e806e9d76904f496d0087cb415ce34791568d11e385492f77a9628d82f4",
+      "packed_date": "2025-09-26T23:20:39.100843"
+    }
+  ],
+  "categories": [
+    "Landscape",
+    "Space"
+  ],
+  "licenses": [
+    "MIT"
+  ],
+  "resolutions": [
+    "1920x1080"
+  ],
+  "api_version": "1.0",
+  "base_url": "/static/wallpapers",
+  "features": {
+    "shuffle_supported": true,
+    "new_tab_shuffle": true,
+    "color_themes": true,
+    "multi_resolution": false
+  },
+  "statistics": {
+    "packs_with_shuffle": 2,
+    "average_pack_size_mb": 104.37,
+    "total_unique_tags": 36
+  }
+}

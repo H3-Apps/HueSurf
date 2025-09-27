@@ -1,0 +1,499 @@
+diff --git a/chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.cc b/chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.cc
+index 1234567..abcdefg 100644
+--- a/chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.cc
++++ b/chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.cc
+@@ -45,6 +45,7 @@
+ #include "chrome/browser/ui/webui/new_tab_page/new_tab_page_handler.h"
+ #include "chrome/browser/ui/webui/new_tab_page/untrusted_source.h"
++#include "chrome/browser/ui/webui/new_tab_page/huesurf_wallpaper_handler.h"
+ #include "chrome/browser/ui/webui/sanitized_image_source.h"
+ #include "chrome/browser/ui/webui/webui_util.h"
+ #include "chrome/common/chrome_features.h"
+@@ -234,6 +235,10 @@ NewTabPageUI::NewTabPageUI(content::WebUI* web_ui)
+                  base::BindRepeating(&NewTabPageUI::CreatePageHandler,
+                                       base::Unretained(this)));
+ 
++  web_ui->AddMessageHandler(
++      std::make_unique<HueSurfWallpaperHandler>(
++          Profile::FromWebUI(web_ui)));
++
+   content::URLDataSource::Add(profile,
+                               std::make_unique<FaviconSource>(
+                                   profile, chrome::FaviconUrlFormat::kFavicon2));
+
+diff --git a/chrome/browser/ui/webui/new_tab_page/huesurf_wallpaper_handler.h b/chrome/browser/ui/webui/new_tab_page/huesurf_wallpaper_handler.h
+new file mode 100644
+index 0000000..1234567
+--- /dev/null
++++ b/chrome/browser/ui/webui/new_tab_page/huesurf_wallpaper_handler.h
+@@ -0,0 +1,68 @@
++// Copyright 2025 The HueSurf Authors. All rights reserved.
++// Use of this source code is governed by a MIT license that can be
++// found in the LICENSE file.
++
++#ifndef CHROME_BROWSER_UI_WEBUI_NEW_TAB_PAGE_HUESURF_WALLPAPER_HANDLER_H_
++#define CHROME_BROWSER_UI_WEBUI_NEW_TAB_PAGE_HUESURF_WALLPAPER_HANDLER_H_
++
++#include <memory>
++#include <string>
++#include <vector>
++
++#include "base/memory/raw_ptr.h"
++#include "base/memory/weak_ptr.h"
++#include "content/public/browser/web_ui_message_handler.h"
++
++class Profile;
++
++namespace base {
++class FilePath;
++class Value;
++class ListValue;
++}  // namespace base
++
++// WebUI handler for HueSurf wallpaper management functionality
++class HueSurfWallpaperHandler : public content::WebUIMessageHandler {
++ public:
++  explicit HueSurfWallpaperHandler(Profile* profile);
++  ~HueSurfWallpaperHandler() override;
++
++  // WebUIMessageHandler implementation
++  void RegisterMessages() override;
++
++ private:
++  // Message handlers
++  void HandleGetWallpaperPacks(const base::Value::List& args);
++  void HandleDownloadWallpaperPack(const base::Value::List& args);
++  void HandleGetInstalledWallpapers(const base::Value::List& args);
++  void HandleSetWallpaper(const base::Value::List& args);
++  void HandleDeleteWallpaperPack(const base::Value::List& args);
++  void HandleGetCurrentWallpaper(const base::Value::List& args);
++
++  // Helper methods
++  void OnWallpaperPackDownloaded(const std::string& pack_id,
++                                 const std::string& callback_id,
++                                 bool success,
++                                 const std::string& error_message);
++  void ExtractWallpaperPack(const base::FilePath& zip_path,
++                           const std::string& pack_id,
++                           const std::string& callback_id);
++  void OnWallpaperPackExtracted(const std::string& pack_id,
++                               const std::string& callback_id,
++                               bool success);
++  base::FilePath GetWallpaperStoragePath();
++  void EnsureWallpaperDirectoryExists();
++  void LoadWallpaperMetadata(const base::FilePath& pack_path);
++  
++  // Network request handler
++  void DownloadWallpaperFromServer(const std::string& pack_id,
++                                  const std::string& callback_id);
++
++  raw_ptr<Profile> profile_;
++  
++  // Weak pointer factory for async callbacks
++  base::WeakPtrFactory<HueSurfWallpaperHandler> weak_ptr_factory_{this};
++
++  DISALLOW_COPY_AND_ASSIGN(HueSurfWallpaperHandler);
++};
++
++#endif  // CHROME_BROWSER_UI_WEBUI_NEW_TAB_PAGE_HUESURF_WALLPAPER_HANDLER_H_
+
+diff --git a/chrome/browser/ui/webui/new_tab_page/huesurf_wallpaper_handler.cc b/chrome/browser/ui/webui/new_tab_page/huesurf_wallpaper_handler.cc
+new file mode 100644
+index 0000000..2345678
+--- /dev/null
++++ b/chrome/browser/ui/webui/new_tab_page/huesurf_wallpaper_handler.cc
+@@ -0,0 +1,378 @@
++// Copyright 2025 The HueSurf Authors. All rights reserved.
++// Use of this source code is governed by a MIT license that can be
++// found in the LICENSE file.
++
++#include "chrome/browser/ui/webui/new_tab_page/huesurf_wallpaper_handler.h"
++
++#include <utility>
++
++#include "base/base64.h"
++#include "base/bind.h"
++#include "base/files/file_path.h"
++#include "base/files/file_util.h"
++#include "base/json/json_reader.h"
++#include "base/json/json_writer.h"
++#include "base/path_service.h"
++#include "base/strings/string_number_conversions.h"
++#include "base/strings/utf_string_conversions.h"
++#include "base/task/post_task.h"
++#include "base/task/thread_pool.h"
++#include "base/threading/thread_restrictions.h"
++#include "base/values.h"
++#include "chrome/browser/profiles/profile.h"
++#include "chrome/common/chrome_paths.h"
++#include "chrome/common/pref_names.h"
++#include "components/prefs/pref_service.h"
++#include "content/public/browser/browser_thread.h"
++#include "content/public/browser/web_ui.h"
++#include "net/base/load_flags.h"
++#include "net/http/http_status_code.h"
++#include "services/network/public/cpp/resource_request.h"
++#include "services/network/public/cpp/simple_url_loader.h"
++#include "services/network/public/mojom/url_response_head.mojom.h"
++#include "third_party/zlib/google/zip.h"
++
++namespace {
++
++const char kHueSurfWallpaperServerUrl[] = "https://huesurf.com/api/wallpapers";
++const char kWallpapersDirName[] = "HueSurfWallpapers";
++const char kWallpaperMetadataFile[] = "metadata.json";
++const char kCurrentWallpaperPref[] = "huesurf.current_wallpaper";
++
++// Helper function to unzip wallpaper pack
++bool UnzipWallpaperPack(const base::FilePath& zip_path,
++                        const base::FilePath& dest_path) {
++  base::ScopedAllowBlocking allow_blocking;
++  if (!base::DirectoryExists(dest_path)) {
++    if (!base::CreateDirectory(dest_path)) {
++      LOG(ERROR) << "Failed to create wallpaper directory: " << dest_path;
++      return false;
++    }
++  }
++  
++  return zip::Unzip(zip_path, dest_path);
++}
++
++// Helper function to read wallpaper metadata
++std::unique_ptr<base::DictionaryValue> ReadWallpaperMetadata(
++    const base::FilePath& pack_path) {
++  base::ScopedAllowBlocking allow_blocking;
++  base::FilePath metadata_path = pack_path.AppendASCII(kWallpaperMetadataFile);
++  
++  std::string metadata_content;
++  if (!base::ReadFileToString(metadata_path, &metadata_content)) {
++    return nullptr;
++  }
++  
++  auto result = base::JSONReader::ReadAndReturnValueWithError(metadata_content);
++  if (!result.has_value() || !result->is_dict()) {
++    return nullptr;
++  }
++  
++  return std::make_unique<base::DictionaryValue>(
++      std::move(result->GetDict()));
++}
++
++}  // namespace
++
++HueSurfWallpaperHandler::HueSurfWallpaperHandler(Profile* profile)
++    : profile_(profile) {
++  EnsureWallpaperDirectoryExists();
++}
++
++HueSurfWallpaperHandler::~HueSurfWallpaperHandler() = default;
++
++void HueSurfWallpaperHandler::RegisterMessages() {
++  web_ui()->RegisterMessageCallback(
++      "getWallpaperPacks",
++      base::BindRepeating(&HueSurfWallpaperHandler::HandleGetWallpaperPacks,
++                          base::Unretained(this)));
++  web_ui()->RegisterMessageCallback(
++      "downloadWallpaperPack",
++      base::BindRepeating(&HueSurfWallpaperHandler::HandleDownloadWallpaperPack,
++                          base::Unretained(this)));
++  web_ui()->RegisterMessageCallback(
++      "getInstalledWallpapers",
++      base::BindRepeating(&HueSurfWallpaperHandler::HandleGetInstalledWallpapers,
++                          base::Unretained(this)));
++  web_ui()->RegisterMessageCallback(
++      "setWallpaper",
++      base::BindRepeating(&HueSurfWallpaperHandler::HandleSetWallpaper,
++                          base::Unretained(this)));
++  web_ui()->RegisterMessageCallback(
++      "deleteWallpaperPack",
++      base::BindRepeating(&HueSurfWallpaperHandler::HandleDeleteWallpaperPack,
++                          base::Unretained(this)));
++  web_ui()->RegisterMessageCallback(
++      "getCurrentWallpaper",
++      base::BindRepeating(&HueSurfWallpaperHandler::HandleGetCurrentWallpaper,
++                          base::Unretained(this)));
++}
++
++void HueSurfWallpaperHandler::HandleGetWallpaperPacks(
++    const base::Value::List& args) {
++  CHECK_EQ(1u, args.size());
++  const std::string& callback_id = args[0].GetString();
++  
++  // Fetch available wallpaper packs from server
++  auto resource_request = std::make_unique<network::ResourceRequest>();
++  resource_request->url = GURL(std::string(kHueSurfWallpaperServerUrl) + "/packs");
++  resource_request->method = "GET";
++  
++  auto url_loader = network::SimpleURLLoader::Create(
++      std::move(resource_request), net::DefineNetworkTrafficAnnotation(
++          "huesurf_wallpaper_packs", R"(
++          semantics {
++            sender: "HueSurf Wallpaper Manager"
++            description:
++              "Fetches available wallpaper packs from HueSurf server."
++            trigger:
++              "User opens wallpaper settings in new tab page."
++            data: "No user data is sent."
++            destination: OTHER
++          }
++          policy {
++            cookies_allowed: NO
++            setting:
++              "This feature can be disabled by not using wallpaper features."
++            chrome_policy {
++              DefaultSearchProviderEnabled {
++                policy_options {mode: MANDATORY}
++                DefaultSearchProviderEnabled: false
++              }
++            }
++          })"));
++  
++  auto* url_loader_ptr = url_loader.get();
++  url_loader_ptr->DownloadToString(
++      profile_->GetURLLoaderFactory().get(),
++      base::BindOnce(
++          [](HueSurfWallpaperHandler* handler, const std::string& callback_id,
++             std::unique_ptr<network::SimpleURLLoader> loader,
++             std::unique_ptr<std::string> response_body) {
++            if (!response_body) {
++              handler->ResolveJavascriptCallback(
++                  base::Value(callback_id),
++                  base::Value(base::Value::Type::DICT));
++              return;
++            }
++            
++            auto result = base::JSONReader::ReadAndReturnValueWithError(
++                *response_body);
++            if (result.has_value()) {
++              handler->ResolveJavascriptCallback(
++                  base::Value(callback_id), std::move(result.value()));
++            } else {
++              handler->ResolveJavascriptCallback(
++                  base::Value(callback_id),
++                  base::Value(base::Value::Type::DICT));
++            }
++          },
++          this, callback_id, std::move(url_loader)),
++      1024 * 1024);  // Max 1MB response
++}
++
++void HueSurfWallpaperHandler::HandleDownloadWallpaperPack(
++    const base::Value::List& args) {
++  CHECK_EQ(2u, args.size());
++  const std::string& callback_id = args[0].GetString();
++  const std::string& pack_id = args[1].GetString();
++  
++  DownloadWallpaperFromServer(pack_id, callback_id);
++}
++
++void HueSurfWallpaperHandler::DownloadWallpaperFromServer(
++    const std::string& pack_id,
++    const std::string& callback_id) {
++  auto resource_request = std::make_unique<network::ResourceRequest>();
++  resource_request->url = GURL(std::string(kHueSurfWallpaperServerUrl) + 
++                               "/pack/" + pack_id + "/download");
++  resource_request->method = "GET";
++  
++  auto url_loader = network::SimpleURLLoader::Create(
++      std::move(resource_request), net::DefineNetworkTrafficAnnotation(
++          "huesurf_wallpaper_download", R"(
++          semantics {
++            sender: "HueSurf Wallpaper Manager"
++            description:
++              "Downloads wallpaper pack from HueSurf server."
++            trigger:
++              "User clicks download on a wallpaper pack."
++            data: "Wallpaper pack identifier."
++            destination: OTHER
++          }
++          policy {
++            cookies_allowed: NO
++            setting:
++              "This feature can be disabled by not using wallpaper features."
++            chrome_policy {
++              DefaultSearchProviderEnabled {
++                policy_options {mode: MANDATORY}
++                DefaultSearchProviderEnabled: false
++              }
++            }
++          })"));
++  
++  base::FilePath temp_dir;
++  base::GetTempDir(&temp_dir);
++  base::FilePath download_path = 
++      temp_dir.AppendASCII(pack_id + "_wallpapers.zip");
++  
++  auto* url_loader_ptr = url_loader.get();
++  url_loader_ptr->DownloadToFile(
++      profile_->GetURLLoaderFactory().get(),
++      base::BindOnce(&HueSurfWallpaperHandler::OnWallpaperPackDownloaded,
++                     weak_ptr_factory_.GetWeakPtr(), pack_id, callback_id),
++      download_path);
++}
++
++void HueSurfWallpaperHandler::OnWallpaperPackDownloaded(
++    const std::string& pack_id,
++    const std::string& callback_id,
++    base::FilePath download_path) {
++  if (download_path.empty()) {
++    OnWallpaperPackExtracted(pack_id, callback_id, false);
++    return;
++  }
++  
++  ExtractWallpaperPack(download_path, pack_id, callback_id);
++}
++
++void HueSurfWallpaperHandler::ExtractWallpaperPack(
++    const base::FilePath& zip_path,
++    const std::string& pack_id,
++    const std::string& callback_id) {
++  base::FilePath wallpaper_dir = GetWallpaperStoragePath();
++  base::FilePath pack_dir = wallpaper_dir.AppendASCII(pack_id);
++  
++  base::ThreadPool::PostTaskAndReplyWithResult(
++      FROM_HERE,
++      {base::TaskPriority::USER_VISIBLE, base::MayBlock()},
++      base::BindOnce(&UnzipWallpaperPack, zip_path, pack_dir),
++      base::BindOnce(&HueSurfWallpaperHandler::OnWallpaperPackExtracted,
++                     weak_ptr_factory_.GetWeakPtr(), pack_id, callback_id));
++}
++
++void HueSurfWallpaperHandler::OnWallpaperPackExtracted(
++    const std::string& pack_id,
++    const std::string& callback_id,
++    bool success) {
++  base::DictionaryValue result;
++  result.SetBoolKey("success", success);
++  result.SetStringKey("pack_id", pack_id);
++  
++  if (success) {
++    result.SetStringKey("message", "Wallpaper pack downloaded successfully");
++  } else {
++    result.SetStringKey("message", "Failed to download wallpaper pack");
++  }
++  
++  ResolveJavascriptCallback(base::Value(callback_id), std::move(result));
++}
++
++void HueSurfWallpaperHandler::HandleGetInstalledWallpapers(
++    const base::Value::List& args) {
++  CHECK_EQ(1u, args.size());
++  const std::string& callback_id = args[0].GetString();
++  
++  base::ThreadPool::PostTaskAndReplyWithResult(
++      FROM_HERE,
++      {base::TaskPriority::USER_VISIBLE, base::MayBlock()},
++      base::BindOnce([](base::FilePath wallpaper_dir) {
++        base::ListValue wallpapers;
++        base::ScopedAllowBlocking allow_blocking;
++        
++        if (!base::DirectoryExists(wallpaper_dir)) {
++          return wallpapers;
++        }
++        
++        base::FileEnumerator pack_enum(wallpaper_dir, false,
++                                       base::FileEnumerator::DIRECTORIES);
++        for (base::FilePath pack_path = pack_enum.Next();
++             !pack_path.empty();
++             pack_path = pack_enum.Next()) {
++          auto metadata = ReadWallpaperMetadata(pack_path);
++          if (!metadata) {
++            continue;
++          }
++          
++          base::FileEnumerator image_enum(
++              pack_path, false,
++              base::FileEnumerator::FILES,
++              FILE_PATH_LITERAL("*.png,*.jpg,*.jpeg,*.webp"));
++          
++          for (base::FilePath image_path = image_enum.Next();
++               !image_path.empty();
++               image_path = image_enum.Next()) {
++            base::DictionaryValue wallpaper;
++            wallpaper.SetStringKey("pack_id", pack_path.BaseName().AsUTF8Unsafe());
++            wallpaper.SetStringKey("filename", image_path.BaseName().AsUTF8Unsafe());
++            wallpaper.SetStringKey("path", image_path.AsUTF8Unsafe());
++            wallpapers.Append(std::move(wallpaper));
++          }
++        }
++        
++        return wallpapers;
++      }, GetWallpaperStoragePath()),
++      base::BindOnce([](HueSurfWallpaperHandler* handler,
++                       const std::string& callback_id,
++                       base::ListValue wallpapers) {
++        handler->ResolveJavascriptCallback(
++            base::Value(callback_id), std::move(wallpapers));
++      }, this, callback_id));
++}
++
++void HueSurfWallpaperHandler::HandleSetWallpaper(
++    const base::Value::List& args) {
++  CHECK_EQ(2u, args.size());
++  const std::string& callback_id = args[0].GetString();
++  const std::string& wallpaper_path = args[1].GetString();
++  
++  // Save wallpaper preference
++  profile_->GetPrefs()->SetString(kCurrentWallpaperPref, wallpaper_path);
++  
++  base::DictionaryValue result;
++  result.SetBoolKey("success", true);
++  result.SetStringKey("wallpaper", wallpaper_path);
++  
++  ResolveJavascriptCallback(base::Value(callback_id), std::move(result));
++  
++  // Notify other tabs about wallpaper change
++  FireWebUIListener("wallpaper-changed", base::Value(wallpaper_path));
++}
++
++void HueSurfWallpaperHandler::HandleDeleteWallpaperPack(
++    const base::Value::List& args) {
++  CHECK_EQ(2u, args.size());
++  const std::string& callback_id = args[0].GetString();
++  const std::string& pack_id = args[1].GetString();
++  
++  base::FilePath pack_path = GetWallpaperStoragePath().AppendASCII(pack_id);
++  
++  base::ThreadPool::PostTaskAndReplyWithResult(
++      FROM_HERE,
++      {base::TaskPriority::USER_VISIBLE, base::MayBlock()},
++      base::BindOnce(&base::DeletePathRecursively, pack_path),
++      base::BindOnce([](HueSurfWallpaperHandler* handler,
++                       const std::string& callback_id,
++                       bool success) {
++        base::DictionaryValue result;
++        result.SetBoolKey("success", success);
++        handler->ResolveJavascriptCallback(
++            base::Value(callback_id), std::move(result));
++      }, this, callback_id));
++}
++
++void HueSurfWallpaperHandler::HandleGetCurrentWallpaper(
++    const base::Value::List& args) {
++  CHECK_EQ(1u, args.size());
++  const std::string& callback_id = args[0].GetString();
++  
++  std::string current_wallpaper = 
++      profile_->GetPrefs()->GetString(kCurrentWallpaperPref);
++  
++  ResolveJavascriptCallback(base::Value(callback_id),
++                           base::Value(current_wallpaper));
++}
++
++base::FilePath HueSurfWallpaperHandler::GetWallpaperStoragePath() {
++  base::FilePath user_data_dir;
++  base::PathService::Get(chrome::DIR_USER_DATA, &user_data_dir);
++  return user_data_dir.AppendASCII(kWallpapersDirName);
++}
++
++void HueSurfWallpaperHandler::EnsureWallpaperDirectoryExists() {
++  base::ThreadPool::PostTask(
++      FROM_HERE,
++      {base::TaskPriority::BEST_EFFORT, base::MayBlock()},
++      base::BindOnce([](base::FilePath wallpaper_dir) {
++        base::ScopedAllowBlocking allow_blocking;
++        if (!base::DirectoryExists(wallpaper_dir)) {
++          base::CreateDirectory(wallpaper_dir);
++        }
++      }, GetWallpaperStoragePath()));
++}

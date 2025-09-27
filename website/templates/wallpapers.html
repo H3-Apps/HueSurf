@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>HueSurf Wallpapers - Download & Management</title>
+
+        <!-- Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+        <!-- Bootstrap CSS -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+
+        <!-- Font Awesome -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+
+        <!-- Custom Tailwind Config -->
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            "hue-red": "#dc2626",
+                            "hue-red-light": "#ef4444",
+                            "hue-red-dark": "#991b1b",
+                            "hue-black": "#0f0f0f",
+                            "hue-gray": "#1a1a1a",
+                            "hue-gray-light": "#2a2a2a",
+                        },
+                        fontFamily: {
+                            inter: ["Inter", "system-ui", "sans-serif"],
+                        },
+                    },
+                },
+            };
+        </script>
+
+        <!-- Custom Styles -->
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+            body {
+                font-family: "Inter", sans-serif;
+                background: linear-gradient(
+                    135deg,
+                    #0f0f0f 0%,
+                    #1a1a1a 50%,
+                    #dc2626 100%
+                );
+                min-height: 100vh;
+            }
+
+            .glass-effect {
+                background: rgba(0, 0, 0, 0.4);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(220, 38, 38, 0.3);
+            }
+
+            .glass-effect-light {
+                background: rgba(0, 0, 0, 0.6);
+                backdrop-filter: blur(15px);
+                border: 1px solid rgba(220, 38, 38, 0.2);
+            }
+
+            .card-hover {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 1px solid rgba(220, 38, 38, 0.2);
+            }
+
+            .card-hover:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 25px 50px -12px rgba(220, 38, 38, 0.4);
+                border-color: rgba(220, 38, 38, 0.6);
+            }
+
+            .progress-bar-animated {
+                background: linear-gradient(90deg, #dc2626, #ef4444, #dc2626);
+                background-size: 200% 100%;
+                animation: progress-shine 2s infinite;
+            }
+
+            @keyframes progress-shine {
+                0% {
+                    background-position: -200% 0;
+                }
+                100% {
+                    background-position: 200% 0;
+                }
+            }
+
+            .btn-hue {
+                background: linear-gradient(135deg, #dc2626, #ef4444);
+                border: none;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+            }
+
+            .btn-hue:hover {
+                background: linear-gradient(135deg, #ef4444, #f87171);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(220, 38, 38, 0.5);
+            }
+
+            .btn-hue:disabled {
+                background: linear-gradient(135deg, #4a5568, #6b7280);
+                box-shadow: none;
+                transform: none;
+            }
+
+            .toggle-switch {
+                position: relative;
+                width: 60px;
+                height: 30px;
+                background: #374151;
+                border-radius: 15px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                border: 2px solid #4b5563;
+            }
+
+            .toggle-switch.active {
+                background: linear-gradient(135deg, #dc2626, #ef4444);
+                border-color: #dc2626;
+                box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
+            }
+
+            .toggle-slider {
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 22px;
+                height: 22px;
+                background: #f1f5f9;
+                border-radius: 50%;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            }
+
+            .toggle-switch.active .toggle-slider {
+                transform: translateX(28px);
+                background: #ffffff;
+                box-shadow: 0 2px 10px rgba(220, 38, 38, 0.3);
+            }
+
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            }
+
+            .notification.show {
+                transform: translateX(0);
+            }
+
+            .shimmer {
+                background: linear-gradient(
+                    90deg,
+                    #374151 25%,
+                    #4b5563 50%,
+                    #374151 75%
+                );
+                background-size: 200% 100%;
+                animation: shimmer 1.5s infinite;
+            }
+
+            @keyframes shimmer {
+                0% {
+                    background-position: -200% 0;
+                }
+                100% {
+                    background-position: 200% 0;
+                }
+            }
+
+            .status-badge {
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .bg-gradient-red {
+                background: linear-gradient(135deg, #dc2626, #991b1b);
+            }
+
+            .text-red-glow {
+                text-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+            }
+
+            .border-red-glow {
+                border-color: #dc2626;
+                box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+            }
+
+            .stat-card {
+                background: rgba(0, 0, 0, 0.6);
+                border: 1px solid rgba(220, 38, 38, 0.3);
+                transition: all 0.3s ease;
+            }
+
+            .stat-card:hover {
+                border-color: rgba(220, 38, 38, 0.6);
+                box-shadow: 0 5px 15px rgba(220, 38, 38, 0.2);
+            }
+
+            .pack-preview-overlay {
+                background: linear-gradient(
+                    to top,
+                    rgba(0, 0, 0, 0.8) 0%,
+                    rgba(0, 0, 0, 0.4) 50%,
+                    rgba(220, 38, 38, 0.2) 100%
+                );
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Navigation -->
+        <nav class="glass-effect border-0 shadow-lg mb-8">
+            <div class="container mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div
+                            class="w-10 h-10 bg-gradient-red rounded-xl flex items-center justify-center shadow-lg"
+                        >
+                            <i class="fas fa-palette text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1
+                                class="text-2xl font-bold text-white m-0 text-red-glow"
+                            >
+                                HueSurf Wallpapers
+                            </h1>
+                            <p class="text-gray-300 text-sm m-0">
+                                Professional wallpaper management
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-400 text-sm">v1.0.0</span>
+                        <div
+                            class="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-lg"
+                            title="System Online"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container mx-auto px-4 pb-8">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-white mb-4 text-red-glow">
+                    Discover Beautiful Wallpapers
+                </h2>
+                <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+                    Download high-quality wallpaper packs, enable dynamic
+                    shuffling, and personalize your browsing experience with
+                    stunning visuals.
+                </p>
+            </div>
+
+            <!-- Settings Panel -->
+            <div class="glass-effect-light rounded-2xl shadow-xl mb-8">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-3">
+                            <div
+                                class="w-8 h-8 bg-gradient-red rounded-lg flex items-center justify-center shadow-lg"
+                            >
+                                <i class="fas fa-cog text-white text-sm"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-white">
+                                Global Settings
+                            </h3>
+                        </div>
+                        <span
+                            class="status-badge bg-red-600 text-white px-3 py-1 rounded-full"
+                            >Active</span
+                        >
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div
+                            class="bg-black/30 rounded-xl p-4 border border-red-500/20"
+                        >
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-random text-red-400"></i>
+                                    <span class="text-white font-medium"
+                                        >Shuffle on New Tab</span
+                                    >
+                                </div>
+                                <div
+                                    class="toggle-switch"
+                                    id="global-shuffle-toggle"
+                                >
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <p class="text-gray-400 text-sm">
+                                Automatically change wallpapers when opening new
+                                tabs
+                            </p>
+                            <input
+                                type="checkbox"
+                                id="global-shuffle"
+                                class="hidden"
+                                checked
+                            />
+                        </div>
+
+                        <div
+                            class="bg-black/30 rounded-xl p-4 border border-red-500/20"
+                        >
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-save text-red-400"></i>
+                                    <span class="text-white font-medium"
+                                        >Remember Wallpaper</span
+                                    >
+                                </div>
+                                <div class="toggle-switch" id="remember-toggle">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <p class="text-gray-400 text-sm">
+                                Keep your last selected wallpaper across
+                                sessions
+                            </p>
+                            <input
+                                type="checkbox"
+                                id="remember-wallpaper"
+                                class="hidden"
+                            />
+                        </div>
+
+                        <div
+                            class="bg-black/30 rounded-xl p-4 border border-red-500/20"
+                        >
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-sync text-red-400"></i>
+                                    <span class="text-white font-medium"
+                                        >Repack Assets</span
+                                    >
+                                </div>
+                                <button
+                                    class="btn btn-outline-danger btn-sm px-4"
+                                    onclick="repackWallpapers()"
+                                    id="repack-btn"
+                                >
+                                    <i class="fas fa-sync-alt me-1"></i> Repack
+                                </button>
+                            </div>
+                            <p class="text-gray-400 text-sm">
+                                Rebuild wallpaper packs from source assets
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="grid md:grid-cols-4 gap-4 mb-8" id="stats-cards">
+                <div class="stat-card backdrop-blur-lg rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm font-medium">
+                                Total Packs
+                            </p>
+                            <p
+                                class="text-2xl font-bold text-white"
+                                id="total-packs"
+                            >
+                                --
+                            </p>
+                        </div>
+                        <i class="fas fa-box text-red-400 text-2xl"></i>
+                    </div>
+                </div>
+                <div class="stat-card backdrop-blur-lg rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm font-medium">
+                                Total Wallpapers
+                            </p>
+                            <p
+                                class="text-2xl font-bold text-white"
+                                id="total-wallpapers"
+                            >
+                                --
+                            </p>
+                        </div>
+                        <i class="fas fa-image text-red-400 text-2xl"></i>
+                    </div>
+                </div>
+                <div class="stat-card backdrop-blur-lg rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm font-medium">
+                                Total Size
+                            </p>
+                            <p
+                                class="text-2xl font-bold text-white"
+                                id="total-size"
+                            >
+                                -- MB
+                            </p>
+                        </div>
+                        <i class="fas fa-hdd text-red-400 text-2xl"></i>
+                    </div>
+                </div>
+                <div class="stat-card backdrop-blur-lg rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm font-medium">
+                                Downloaded
+                            </p>
+                            <p
+                                class="text-2xl font-bold text-white"
+                                id="downloaded-count"
+                            >
+                                --
+                            </p>
+                        </div>
+                        <i class="fas fa-download text-red-400 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="text-center py-12" id="loading-state">
+                <div
+                    class="inline-flex items-center justify-center w-16 h-16 bg-black/40 rounded-full mb-4 border border-red-500/30"
+                >
+                    <i class="fas fa-spinner fa-spin text-red-400 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">
+                    Loading Wallpaper Packs
+                </h3>
+                <p class="text-gray-400">
+                    Fetching the latest wallpaper collections...
+                </p>
+            </div>
+
+            <!-- Wallpaper Packs Grid -->
+            <div
+                class="grid lg:grid-cols-2 xl:grid-cols-3 gap-8"
+                id="wallpaper-grid"
+                style="display: none"
+            ></div>
+
+            <!-- Empty State -->
+            <div
+                class="text-center py-16"
+                id="empty-state"
+                style="display: none"
+            >
+                <div
+                    class="inline-flex items-center justify-center w-24 h-24 bg-black/40 rounded-full mb-6 border border-red-500/30"
+                >
+                    <i class="fas fa-image text-gray-500 text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-semibold text-white mb-2">
+                    No Wallpaper Packs Found
+                </h3>
+                <p class="text-gray-400 mb-6">
+                    It looks like there are no wallpaper packs available right
+                    now.
+                </p>
+                <button
+                    class="btn-hue btn btn-lg"
+                    onclick="loadWallpaperPacks()"
+                >
+                    <i class="fas fa-refresh me-2"></i>Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div id="notification-container"></div>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            const API_BASE = "/api/wallpapers";
+            let downloadedPacks = JSON.parse(
+                localStorage.getItem("downloadedPacks") || "[]",
+            );
+            let wallpaperPacks = [];
+
+            // Initialize the application
+            document.addEventListener("DOMContentLoaded", function () {
+                initializeToggles();
+                loadSettings();
+                loadWallpaperPacks();
+            });
+
+            // Initialize toggle switches
+            function initializeToggles() {
+                document
+                    .getElementById("global-shuffle-toggle")
+                    .addEventListener("click", function () {
+                        const checkbox =
+                            document.getElementById("global-shuffle");
+                        checkbox.checked = !checkbox.checked;
+                        this.classList.toggle("active", checkbox.checked);
+                        localStorage.setItem("globalShuffle", checkbox.checked);
+                        showNotification(
+                            `Shuffle ${checkbox.checked ? "enabled" : "disabled"}`,
+                            checkbox.checked ? "success" : "info",
+                        );
+                    });
+
+                document
+                    .getElementById("remember-toggle")
+                    .addEventListener("click", function () {
+                        const checkbox =
+                            document.getElementById("remember-wallpaper");
+                        checkbox.checked = !checkbox.checked;
+                        this.classList.toggle("active", checkbox.checked);
+                        localStorage.setItem(
+                            "rememberWallpaper",
+                            checkbox.checked,
+                        );
+                        showNotification(
+                            `Remember wallpaper ${checkbox.checked ? "enabled" : "disabled"}`,
+                            "info",
+                        );
+                    });
+            }
+
+            // Load settings from localStorage
+            function loadSettings() {
+                const globalShuffle =
+                    localStorage.getItem("globalShuffle") !== "false";
+                const rememberWallpaper =
+                    localStorage.getItem("rememberWallpaper") === "true";
+
+                document.getElementById("global-shuffle").checked =
+                    globalShuffle;
+                document.getElementById("remember-wallpaper").checked =
+                    rememberWallpaper;
+
+                document
+                    .getElementById("global-shuffle-toggle")
+                    .classList.toggle("active", globalShuffle);
+                document
+                    .getElementById("remember-toggle")
+                    .classList.toggle("active", rememberWallpaper);
+            }
+
+            // Load wallpaper packs
+            async function loadWallpaperPacks() {
+                const loadingEl = document.getElementById("loading-state");
+                const gridEl = document.getElementById("wallpaper-grid");
+                const emptyEl = document.getElementById("empty-state");
+
+                loadingEl.style.display = "block";
+                gridEl.style.display = "none";
+                emptyEl.style.display = "none";
+
+                try {
+                    const response = await fetch(`${API_BASE}/packs`);
+                    const data = await response.json();
+
+                    if (data.success && data.packs && data.packs.length > 0) {
+                        wallpaperPacks = data.packs;
+                        updateStatistics(data);
+                        renderWallpaperPacks(data.packs);
+
+                        loadingEl.style.display = "none";
+                        gridEl.style.display = "grid";
+                    } else {
+                        loadingEl.style.display = "none";
+                        emptyEl.style.display = "block";
+                    }
+                } catch (error) {
+                    console.error("Error loading wallpaper packs:", error);
+                    showNotification("Failed to load wallpaper packs", "error");
+                    loadingEl.style.display = "none";
+                    emptyEl.style.display = "block";
+                }
+            }
+
+            // Update statistics
+            function updateStatistics(data) {
+                document.getElementById("total-packs").textContent =
+                    data.total_packs || 0;
+                document.getElementById("total-wallpapers").textContent =
+                    data.packs.reduce((sum, pack) => sum + pack.count, 0);
+                document.getElementById("total-size").textContent =
+                    `${data.packs.reduce((sum, pack) => sum + pack.size_mb, 0).toFixed(1)} MB`;
+                document.getElementById("downloaded-count").textContent =
+                    downloadedPacks.length;
+            }
+
+            // Render wallpaper packs
+            function renderWallpaperPacks(packs) {
+                const gridEl = document.getElementById("wallpaper-grid");
+                gridEl.innerHTML = "";
+
+                packs.forEach((pack) => {
+                    const packCard = createPackCard(pack);
+                    gridEl.appendChild(packCard);
+                });
+            }
+
+            // Create pack card
+            function createPackCard(pack) {
+                const isDownloaded = downloadedPacks.includes(pack.id);
+                const card = document.createElement("div");
+                card.className =
+                    "glass-effect-light backdrop-blur-lg rounded-2xl overflow-hidden card-hover shadow-xl";
+
+                const colors = pack.colors || {};
+                const colorIndicator = colors.primary
+                    ? `style="background: ${colors.primary}; border: 2px solid ${colors.primary}40;"`
+                    : "";
+
+                card.innerHTML = `
+                <div class="relative h-48 overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
+                    <img src="${pack.preview}" alt="${pack.name} preview"
+                         class="w-full h-full object-cover transition-transform duration-300"
+                         onerror="this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-full bg-gradient-to-br from-gray-800 to-gray-900\\><i class=\\'fas fa-image text-gray-600 text-4xl\\'></i></div>'"
+                         onload="this.classList.add('hover:scale-110')">
+                    <div class="absolute top-3 left-3">
+                        ${pack.shuffle_enabled ? '<span class="status-badge bg-red-600 text-white px-2 py-1 rounded-full text-xs shadow-lg"><i class="fas fa-random me-1"></i>Shuffle</span>' : ""}
+                    </div>
+                    <div class="absolute top-3 right-3">
+                        ${colors.primary ? `<div class="w-6 h-6 rounded-full shadow-lg" ${colorIndicator}></div>` : ""}
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 pack-preview-overlay p-4">
+                        <div class="flex items-center justify-between text-white">
+                            <div>
+                                <span class="text-sm font-medium">${pack.count} wallpapers</span>
+                            </div>
+                            <div>
+                                <span class="text-sm">${pack.size_mb} MB</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6">
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-xl font-bold text-white">${pack.name}</h3>
+                            <span class="status-badge bg-red-600/20 text-red-300 px-2 py-1 rounded-full text-xs border border-red-500/30">${pack.category}</span>
+                        </div>
+                        <p class="text-gray-400 text-sm line-clamp-2">${pack.description}</p>
+                        <div class="flex items-center mt-2 text-xs text-gray-500">
+                            <i class="fas fa-user me-1"></i>${pack.author} • ${pack.created_date || "Recent"}
+                        </div>
+                    </div>
+
+                    ${
+                        pack.recommended_for && pack.recommended_for.length > 0
+                            ? `
+                    <div class="mb-4">
+                        <p class="text-gray-500 text-xs mb-2">Recommended for:</p>
+                        <div class="flex flex-wrap gap-1">
+                            ${pack.recommended_for
+                                .map(
+                                    (platform) =>
+                                        `<span class="bg-black/30 text-gray-400 px-2 py-1 rounded text-xs border border-red-500/20">${platform}</span>`,
+                                )
+                                .join("")}
+                        </div>
+                    </div>
+                    `
+                            : ""
+                    }
+
+                    <div class="flex gap-2">
+                        <button class="btn-hue btn flex-1 ${isDownloaded ? "opacity-50" : ""}"
+                                onclick="downloadPack('${pack.id}', '${pack.name}', this)"
+                                ${isDownloaded ? "disabled" : ""}>
+                            <i class="fas fa-${isDownloaded ? "check" : "download"} me-2"></i>
+                            ${isDownloaded ? "Downloaded" : "Download"}
+                        </button>
+                        ${
+                            pack.shuffle_enabled
+                                ? `
+                        <button class="btn btn-outline-danger" onclick="testShuffle('${pack.id}')" title="Test shuffle">
+                            <i class="fas fa-dice"></i>
+                        </button>
+                        `
+                                : ""
+                        }
+                    </div>
+
+                    <div class="progress mt-3" id="progress-${pack.id}" style="display: none; height: 6px; background: rgba(0,0,0,0.3);">
+                        <div class="progress-bar progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+            `;
+
+                return card;
+            }
+
+            // Download pack
+            async function downloadPack(packId, packName, buttonEl) {
+                const progressEl = document.getElementById(
+                    `progress-${packId}`,
+                );
+                const progressBar = progressEl.querySelector(".progress-bar");
+
+                buttonEl.disabled = true;
+                buttonEl.innerHTML =
+                    '<i class="fas fa-spinner fa-spin me-2"></i>Downloading...';
+                progressEl.style.display = "block";
+
+                // Simulate progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.random() * 20;
+                    progress = Math.min(progress, 90);
+                    progressBar.style.width = progress + "%";
+                }, 200);
+
+                try {
+                    const response = await fetch(
+                        `${API_BASE}/pack/${packName}/download`,
+                    );
+
+                    if (!response.ok) {
+                        throw new Error("Download failed");
+                    }
+
+                    const blob = await response.blob();
+
+                    // Complete progress
+                    clearInterval(progressInterval);
+                    progressBar.style.width = "100%";
+
+                    // Create download
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `${packName}_wallpapers.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+
+                    // Mark as downloaded
+                    downloadedPacks.push(packId);
+                    localStorage.setItem(
+                        "downloadedPacks",
+                        JSON.stringify(downloadedPacks),
+                    );
+
+                    buttonEl.innerHTML =
+                        '<i class="fas fa-check me-2"></i>Downloaded';
+                    buttonEl.classList.add("opacity-50");
+                    progressEl.style.display = "none";
+
+                    showNotification(
+                        `${packName} downloaded successfully!`,
+                        "success",
+                    );
+                    updateStatistics({
+                        packs: wallpaperPacks,
+                        total_packs: wallpaperPacks.length,
+                    });
+                } catch (error) {
+                    clearInterval(progressInterval);
+                    buttonEl.disabled = false;
+                    buttonEl.innerHTML =
+                        '<i class="fas fa-download me-2"></i>Download';
+                    progressEl.style.display = "none";
+
+                    showNotification(`Failed to download ${packName}`, "error");
+                    console.error("Download error:", error);
+                }
+            }
+
+            // Test shuffle for a specific pack
+            async function testShuffle(packId) {
+                try {
+                    const pack = wallpaperPacks.find((p) => p.id === packId);
+                    if (!pack) {
+                        showNotification("Pack not found", "error");
+                        return;
+                    }
+
+                    showNotification(
+                        `Testing shuffle for ${pack.name}...`,
+                        "info",
+                    );
+
+                    // Simulate shuffle test
+                    setTimeout(() => {
+                        showNotification(
+                            `Shuffle test completed for ${pack.name}`,
+                            "success",
+                        );
+                    }, 1500);
+                } catch (error) {
+                    showNotification("Shuffle test failed", "error");
+                    console.error("Shuffle test error:", error);
+                }
+            }
+
+            // Repack wallpapers
+            async function repackWallpapers() {
+                const btn = document.getElementById("repack-btn");
+                if (!btn) return;
+
+                btn.disabled = true;
+                btn.innerHTML =
+                    '<i class="fas fa-spinner fa-spin me-1"></i> Repacking...';
+
+                try {
+                    const response = await fetch(`${API_BASE}/repack`, {
+                        method: "POST",
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Repack failed");
+                    }
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showNotification(
+                            "Wallpapers repacked successfully!",
+                            "success",
+                        );
+                        // Reload packs after repacking
+                        loadWallpaperPacks();
+                    } else {
+                        throw new Error(result.message || "Repack failed");
+                    }
+                } catch (error) {
+                    showNotification("Failed to repack wallpapers", "error");
+                    console.error("Repack error:", error);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML =
+                        '<i class="fas fa-sync-alt me-1"></i> Repack';
+                }
+            }
+
+            // Show notification
+            function showNotification(message, type = "info") {
+                const container = document.getElementById(
+                    "notification-container",
+                );
+                if (!container) return;
+
+                const notification = document.createElement("div");
+                notification.className = `notification alert alert-${getAlertClass(type)} alert-dismissible fade`;
+
+                notification.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-${getIconClass(type)} me-2"></i>
+                        <span>${message}</span>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+
+                container.appendChild(notification);
+
+                // Show notification
+                setTimeout(() => {
+                    notification.classList.add("show");
+                }, 100);
+
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    notification.classList.remove("show");
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, 5000);
+            }
+
+            // Get alert class for notification type
+            function getAlertClass(type) {
+                const classes = {
+                    success: "success",
+                    error: "danger",
+                    warning: "warning",
+                    info: "info",
+                };
+                return classes[type] || "info";
+            }
+
+            // Get icon class for notification type
+            function getIconClass(type) {
+                const icons = {
+                    success: "check-circle",
+                    error: "exclamation-triangle",
+                    warning: "exclamation-circle",
+                    info: "info-circle",
+                };
+                return icons[type] || "info-circle";
+            }
+
+            // Handle keyboard shortcuts
+            document.addEventListener("keydown", function (event) {
+                // R key for refresh
+                if (event.key === "r" && event.ctrlKey) {
+                    event.preventDefault();
+                    loadWallpaperPacks();
+                }
+
+                // Escape key to close notifications
+                if (event.key === "Escape") {
+                    const notifications =
+                        document.querySelectorAll(".notification.show");
+                    notifications.forEach((notification) => {
+                        notification.classList.remove("show");
+                        setTimeout(() => {
+                            if (notification.parentNode) {
+                                notification.parentNode.removeChild(
+                                    notification,
+                                );
+                            }
+                        }, 300);
+                    });
+                }
+            });
+
+            // Add CSS animation utility
+            function animateValue(element, start, end, duration, suffix = "") {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min(
+                        (timestamp - startTimestamp) / duration,
+                        1,
+                    );
+                    const value = Math.floor(progress * (end - start) + start);
+                    element.textContent = value + suffix;
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+
+            // Initialize pack search functionality
+            function initializeSearch() {
+                const searchInput = document.createElement("input");
+                searchInput.type = "text";
+                searchInput.placeholder = "Search wallpaper packs...";
+                searchInput.className =
+                    "form-control bg-black/30 border-red-500/30 text-white mb-4";
+                searchInput.style.display = "none"; // Initially hidden
+
+                const gridContainer =
+                    document.getElementById("wallpaper-grid").parentElement;
+                gridContainer.insertBefore(
+                    searchInput,
+                    document.getElementById("wallpaper-grid"),
+                );
+
+                searchInput.addEventListener("input", function () {
+                    const query = this.value.toLowerCase();
+                    const filteredPacks = wallpaperPacks.filter(
+                        (pack) =>
+                            pack.name.toLowerCase().includes(query) ||
+                            pack.description.toLowerCase().includes(query) ||
+                            pack.category.toLowerCase().includes(query) ||
+                            pack.author.toLowerCase().includes(query),
+                    );
+                    renderWallpaperPacks(filteredPacks);
+                });
+
+                return searchInput;
+            }
+
+            // Add search toggle to navigation
+            function addSearchToggle() {
+                const searchInput = initializeSearch();
+                const nav = document.querySelector("nav .container");
+                const searchToggle = document.createElement("button");
+                searchToggle.className = "btn btn-outline-light btn-sm";
+                searchToggle.innerHTML = '<i class="fas fa-search"></i>';
+                searchToggle.title = "Toggle Search";
+
+                searchToggle.addEventListener("click", function () {
+                    const isVisible = searchInput.style.display !== "none";
+                    searchInput.style.display = isVisible ? "none" : "block";
+                    if (!isVisible) {
+                        searchInput.focus();
+                    } else {
+                        searchInput.value = "";
+                        renderWallpaperPacks(wallpaperPacks);
+                    }
+                });
+
+                const rightSection = nav.querySelector(
+                    ".flex.items-center.space-x-4",
+                );
+                rightSection.insertBefore(
+                    searchToggle,
+                    rightSection.firstChild,
+                );
+            }
+
+            // Initialize search when DOM is ready
+            document.addEventListener("DOMContentLoaded", function () {
+                setTimeout(addSearchToggle, 1000); // Add after initial load
+            });
+
+            // Export functions for global access
+            window.downloadPack = downloadPack;
+            window.testShuffle = testShuffle;
+            window.repackWallpapers = repackWallpapers;
+            window.loadWallpaperPacks = loadWallpaperPacks;
+        </script>
+    </body>
+</html>

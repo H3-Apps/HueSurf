@@ -1,0 +1,51 @@
+{
+  "pack_name": "Indiana",
+  "version": "1.0.0",
+  "author": "Henry Perzinski",
+  "description": "Indiana-themed wallpapers",
+  "category": "Landscape",
+  "created_date": "2025-01-01",
+  "shuffle_enabled": true,
+  "shuffle_on_new_tab": true,
+  "wallpapers": [
+    {
+      "filename": "mount tree.png",
+      "name": "Mountain Tree",
+      "description": "Scenic hill view with trees",
+      "tags": ["hill", "tree", "nature", "landscape", "indiana"]
+    },
+    {
+      "filename": "roads.png",
+      "name": "Path",
+      "description": "Path to a hill!",
+      "tags": ["path", "hill", "tree", "landscape", "indiana"]
+    },
+    {
+      "filename": "rush.png",
+      "name": "Rush Rock",
+      "description": "A rush of rocks",
+      "tags": ["rocks", "mountain", "motion", "dynamic", "indiana"]
+    },
+    {
+      "filename": "tracks.png",
+      "name": "Tracks",
+      "description": "The most beautiful wallpaper ever made",
+      "tags": ["hill", "tracks", "landscape", "down", "indiana"]
+    }
+  ],
+  "colors": {
+    "primary": "#E86F51",
+    "secondary": "#4A90E2",
+    "accent": "#50C878"
+  },
+  "recommended_for": ["desktop", "tablet"],
+  "min_resolution": "1920x1080",
+  "license": "MIT",
+  "settings": {
+    "shuffle_interval": "new_tab",
+    "transition_effect": "fade",
+    "transition_duration": 500,
+    "allow_user_shuffle": true,
+    "remember_last_wallpaper": false
+  }
+}

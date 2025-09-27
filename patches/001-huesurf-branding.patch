@@ -15,7 +15,7 @@ index 1234567..abcdefg 100644
 +PRODUCT_SHORTNAME=HueSurf
 +PRODUCT_INSTALLER_FULLNAME=HueSurf Browser
 +PRODUCT_INSTALLER_SHORTNAME=HueSurf
- COPYRIGHT=Copyright 2024 The HueSurf Authors. All rights reserved.
+ COPYRIGHT=Copyright 2025 The HueSurf Authors. All rights reserved.
 -MAC_BUNDLE_ID=org.chromium.Chromium
 -MAC_CREATOR_CODE=Cr24
 +MAC_BUNDLE_ID=org.huesurf.HueSurf
