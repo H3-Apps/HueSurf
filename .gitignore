@@ -1,0 +1,201 @@
+# HueSurf Build System - Git Ignore Rules
+# Made by 3 dudes who don't want 35GB+ of Chromium source in Git!
+
+# === Build Directories ===
+# These contain the massive Chromium source and build artifacts
+chromium_src/           # Downloaded Chromium source (~35GB)
+depot_tools/           # Google's build tools
+build/                 # Build working directory
+dist/                  # Final packaged browsers
+out/                   # Build output directory
+*.ninja                # Ninja build files
+*.ninja_deps           # Ninja dependency files
+
+# === Build Artifacts ===
+# Compiled binaries and intermediate files
+*.o                    # Object files
+*.a                    # Static libraries
+*.so                   # Shared libraries (Linux)
+*.dylib               # Dynamic libraries (macOS)
+*.dll                 # Dynamic libraries (Windows)
+*.exe                 # Windows executables
+*.app/                # macOS app bundles
+*.dSYM/               # macOS debug symbols
+*.pdb                 # Windows debug files
+*.ilk                 # Windows incremental linker files
+*.exp                 # Windows export files
+*.lib                 # Windows static libraries
+
+# === Platform-Specific Files ===
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+*.tmp
+*.temp
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# === Development Tools ===
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-*
+
+# Xcode (macOS development)
+*.xcodeproj/
+*.xcworkspace/
+DerivedData/
+*.hmap
+*.ipa
+
+# Visual Studio (Windows development)
+*.vcxproj*
+*.sln
+*.suo
+*.user
+bin/
+obj/
+packages/
+.vs/
+
+# === Python ===
+# Build scripts use Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg-info/
+.pytest_cache/
+
+# === Node.js (Website) ===
+# In case we add Node.js tools later
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# === Logs and Debugging ===
+*.log
+*.out
+*.err
+build.log
+debug.log
+crash.log
+*.crash
+
+# === Temporary Files ===
+tmp/
+temp/
+.tmp/
+*.backup
+*.bak
+*.orig
+*.rej
+*.patch.orig
+
+# === Archives and Packages ===
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.tgz
+
+# === Security ===
+# Don't commit sensitive data
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.json
+.env
+.env.local
+.env.*.local
+
+# === HueSurf Specific ===
+# Custom build configurations (keep template, ignore local)
+config/local_args.gn
+config/debug_args.gn
+patches/local-*.patch
+website/.env
+
+# === Testing ===
+coverage/
+.nyc_output
+test-results/
+screenshots/
+
+# === Documentation Build ===
+docs/build/
+site/
+
+# Keep important files (override ignores)
+!BUILD.md
+!README.md
+!patches/README.md
+!website/README.md
+!scripts/build.sh
+!config/custom_args.gn
+!patches/*.patch
+
+# === Version Control ===
+.svn/
+.hg/
+.bzr/
+
+# === Backup Files ===
+*~
+*.swp
+*.swo
+.#*
+#*#
+
+# === JetBrains ===
+.idea/
+*.iml
+*.iws
+
+# === Android (for future mobile support) ===
+*.apk
+*.ap_
+*.dex
+local.properties
+proguard/
+
+# === iOS (for future mobile support) ===
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Remember: If Javier's robot starts creating files, add them here too! 🤖
