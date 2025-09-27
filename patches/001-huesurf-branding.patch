@@ -1,0 +1,150 @@
+diff --git a/chrome/app/theme/chromium/BRANDING b/chrome/app/theme/chromium/BRANDING
+index 1234567..abcdefg 100644
+--- a/chrome/app/theme/chromium/BRANDING
++++ b/chrome/app/theme/chromium/BRANDING
+@@ -1,11 +1,11 @@
+-COMPANY_FULLNAME=The Chromium Authors
+-COMPANY_SHORTNAME=Chromium Authors  
+-PRODUCT_FULLNAME=Chromium
+-PRODUCT_SHORTNAME=Chromium
+-PRODUCT_INSTALLER_FULLNAME=Chromium
+-PRODUCT_INSTALLER_SHORTNAME=Chromium
++COMPANY_FULLNAME=HueSurf Team
++COMPANY_SHORTNAME=HueSurf
++PRODUCT_FULLNAME=HueSurf
++PRODUCT_SHORTNAME=HueSurf
++PRODUCT_INSTALLER_FULLNAME=HueSurf Browser
++PRODUCT_INSTALLER_SHORTNAME=HueSurf
+ COPYRIGHT=Copyright 2024 The HueSurf Authors. All rights reserved.
+-MAC_BUNDLE_ID=org.chromium.Chromium
+-MAC_CREATOR_CODE=Cr24
++MAC_BUNDLE_ID=org.huesurf.HueSurf
++MAC_CREATOR_CODE=HuSf
+ CHROMIUM_BUILD=1
+ 
+diff --git a/chrome/browser/ui/webui/about_ui.cc b/chrome/browser/ui/webui/about_ui.cc
+index 2345678..bcdefgh 100644
+--- a/chrome/browser/ui/webui/about_ui.cc
++++ b/chrome/browser/ui/webui/about_ui.cc
+@@ -156,7 +156,7 @@ std::u16string ChromeVersionInfo() {
+   std::u16string version_text = l10n_util::GetStringUTF16(IDS_ABOUT_VERSION);
+   version_text += u" ";
+   version_text += base::UTF8ToUTF16(version_info.Version());
+-  version_text += u" (Official Build)";
++  version_text += u" (HueSurf Build)";
+   
+   if (version_info.IsOfficialBuild()) {
+     version_text += u" ";
+
+diff --git a/chrome/common/chrome_constants.cc b/chrome/common/chrome_constants.cc
+index 3456789..cdefghi 100644
+--- a/chrome/common/chrome_constants.cc
++++ b/chrome/common/chrome_constants.cc
+@@ -12,15 +12,15 @@
+ 
+ namespace chrome {
+ 
+-const char kApplicationName[] = "Chromium";
++const char kApplicationName[] = "HueSurf";
+ const char kProductName[] = "HueSurf";
+ 
+ const base::FilePath::CharType kBrowserProcessExecutableName[] =
+-    FILE_PATH_LITERAL("chrome");
++    FILE_PATH_LITERAL("huesurf");
+ const base::FilePath::CharType kHelperProcessExecutableName[] =
+-    FILE_PATH_LITERAL("chrome_helper");
++    FILE_PATH_LITERAL("huesurf_helper");
+ const base::FilePath::CharType kBrowserProcessExecutableNameChromium[] =
+-    FILE_PATH_LITERAL("chromium-browser");
++    FILE_PATH_LITERAL("huesurf-browser");
+ 
+ #if BUILDFLAG(IS_WIN)
+ const base::FilePath::CharType kBrowserProcessExecutablePath[] =
+
+diff --git a/components/search_engines/prepopulated_engines.json b/components/search_engines/prepopulated_engines.json
+index 4567890..defghij 100644
+--- a/components/search_engines/prepopulated_engines.json
++++ b/components/search_engines/prepopulated_engines.json
+@@ -85,7 +85,7 @@
+       "name": "DuckDuckGo",
+       "keyword": "duckduckgo.com",
+       "favicon_url": "https://duckduckgo.com/favicon.ico",
+-      "search_url": "https://duckduckgo.com/?q={searchTerms}&t=chromium",
++      "search_url": "https://duckduckgo.com/?q={searchTerms}&t=huesurf",
+       "suggest_url": "https://duckduckgo.com/ac/?q={searchTerms}&type=list",
+       "instant_url": "",
+       "image_url": "",
+
+diff --git a/chrome/browser/google/google_brand.cc b/chrome/browser/google/google_brand.cc
+index 5678901..efghijk 100644
+--- a/chrome/browser/google/google_brand.cc
++++ b/chrome/browser/google/google_brand.cc
+@@ -15,7 +15,7 @@ namespace google_brand {
+ 
+ bool GetBrand(std::string* brand) {
+   if (!brand)
+     return false;
+-  brand->assign("GGRM");  // Chromium brand
++  brand->assign("HUES");  // HueSurf brand
+   return true;
+ }
+
+diff --git a/chrome/browser/about_flags.cc b/chrome/browser/about_flags.cc
+index 6789012..fghijkl 100644
+--- a/chrome/browser/about_flags.cc
++++ b/chrome/browser/about_flags.cc
+@@ -2847,6 +2847,11 @@ const FeatureEntry kFeatureEntries[] = {
+      flag_descriptions::kEnableAccessibilityExposeDisplayNoneDescription,
+      kOsDesktop,
+      FEATURE_VALUE_TYPE(features::kEnableAccessibilityExposeDisplayNone)},
++    {"huesurf-clean-mode",
++     "HueSurf Clean Mode",
++     "Enable HueSurf's enhanced ad blocking and privacy features",
++     kOsDesktop,
++     FEATURE_VALUE_TYPE(features::kHueSurfCleanMode)},
+ };
+ 
+ class FlagsStateSingleton : public flags_ui::FlagsState {
+
+diff --git a/chrome/app/resources/google_chrome_strings.grd b/chrome/app/resources/google_chrome_strings.grd
+index 7890123..ghijklm 100644
+--- a/chrome/app/resources/google_chrome_strings.grd
++++ b/chrome/app/resources/google_chrome_strings.grd
+@@ -234,7 +234,7 @@ are declared in tools/grit/grit_rule.gni.
+   </if>
+   <message name="IDS_PRODUCT_NAME" desc="The application name">
+-    Chromium
++    HueSurf
+   </message>
+   <if expr="is_win">
+     <message name="IDS_PRODUCT_NAME_BASE" desc="The base application name">
+
+diff --git a/chrome/browser/chrome_browser_main.cc b/chrome/browser/chrome_browser_main.cc
+index 8901234..hijklmn 100644
+--- a/chrome/browser/chrome_browser_main.cc
++++ b/chrome/browser/chrome_browser_main.cc
+@@ -1847,6 +1847,10 @@ int ChromeBrowserMainParts::PreCreateThreadsImpl() {
+ 
+   ApplyMetricsReportingPolicy();
+ 
++  // HueSurf: Disable various Google services and tracking
++  base::CommandLine::ForCurrentProcess()->AppendSwitch(
++      "disable-background-networking");
++
+ #if BUILDFLAG(IS_MAC)
+   // The Mac Keychain services requires the CFRunLoop to be run nested, which
+   // is not compatible with the MessageLoop approach. Instead, we create a
+
+diff --git a/components/google/core/common/google_util.cc b/components/google/core/common/google_util.cc
+index 9012345..ijklmno 100644
+--- a/components/google/core/common/google_util.cc
++++ b/components/google/core/common/google_util.cc
+@@ -65,7 +65,8 @@ bool IsGoogleDomainUrl(const GURL& url,
+ }
+ 
+ bool IsGoogleHomePageUrl(const GURL& url) {
+-  return IsGoogleDomainUrl(url, ALLOW_SUBDOMAIN, ALLOW_NON_STANDARD_PORTS) &&
++  // HueSurf: Disable Google homepage detection
++  return false &&
+          (url.path_piece() == "/" || url.path_piece() == "/webhp");
+ }
