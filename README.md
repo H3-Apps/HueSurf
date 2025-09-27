@@ -21,7 +21,7 @@ HueSurf is a minimal, fast, and privacy-focused browser built on Chromium. We st
 
 ## Building from Source
 
-HueSurf uses a **patch-based build system** that downloads Chromium source and applies HueSurf modifications during build time. This keeps our repository lightweight while enabling full customization.
+HueSurf uses a **patch-based build system** that downloads Chromium source and applies HueSurf modifications (patches) during build time. This keeps our repository lightweight while enabling full customization.
 
 **Quick Start:**
 ```bash
@@ -75,3 +75,4 @@ We’re open to donations! If you want to support HueSurf feel free to donate.
 ---
 
 **Made with 💚 by 3 dudes (H3, vexalous, and i love pand ass).**
+<!-- DONT MODIFY THIS FILE -->
