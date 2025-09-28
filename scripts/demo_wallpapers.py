@@ -20,36 +20,41 @@ import requests
 from pathlib import Path
 import zipfile
 import tempfile
-import shutil
 import subprocess
 import sys
 
 
 class WallpaperDemo:
+    """Class to demonstrate HueSurf wallpaper system"""
+
     def __init__(self):
         self.project_root = Path(__file__).parent.parent
         self.assets_dir = self.project_root / "assets" / "Wallpapers"
         self.static_dir = self.project_root / "website" / "static" / "wallpapers"
-        self.server_url = (
-            "http://localhost:5001"  # Using different port to avoid conflicts
-        )
+        self.server_url = "http://localhost:5001"  # Using different port to avoid conflicts
+        self.server_process = None
 
-    def print_header(self, title):
+    @staticmethod
+    def print_header(title):
         print("\n" + "=" * 60)
         print(f"🎨 {title}")
         print("=" * 60)
 
-    def print_step(self, step):
+    @staticmethod
+    def print_step(step):
         print(f"\n📍 {step}")
         print("-" * 40)
 
-    def print_success(self, message):
+    @staticmethod
+    def print_success(message):
         print(f"✅ {message}")
 
-    def print_info(self, message):
+    @staticmethod
+    def print_info(message):
         print(f"ℹ️  {message}")
 
-    def print_error(self, message):
+    @staticmethod
+    def print_error(message):
         print(f"❌ {message}")
 
     def demo_1_check_assets(self):
@@ -83,9 +88,8 @@ class WallpaperDemo:
                     f"{'(with metadata)' if has_metadata else '(no metadata)'}"
                 )
 
-
                 # Show a few wallpaper names
-                for i, img in enumerate(image_files[:3]):
+                for img in image_files[:3]:
                     print(f"     • {img.name}")
                 if len(image_files) > 3:
                     print(f"     • ... and {len(image_files) - 3} more")
@@ -127,8 +131,8 @@ class WallpaperDemo:
         except subprocess.TimeoutExpired:
             self.print_error("Packer timed out")
             return False
-        except Exception as e:
-            self.print_error(f"Error running packer: {e}")
+        except Exception as exc:
+            self.print_error(f"Error running packer: {exc}")
             return False
 
         return True
@@ -144,7 +148,7 @@ class WallpaperDemo:
         # Check manifest
         manifest_path = self.static_dir / "manifest.json"
         if manifest_path.exists():
-            with open(manifest_path, "r") as f:
+            with open(manifest_path, "r", encoding="utf-8") as f:
                 manifest = json.load(f)
 
             self.print_success("Found manifest.json:")
@@ -211,8 +215,8 @@ class WallpaperDemo:
             self.print_error("Server failed to start properly")
             return False
 
-        except Exception as e:
-            self.print_error(f"Error starting server: {e}")
+        except Exception as exc:
+            self.print_error(f"Error starting server: {exc}")
             return False
 
     def demo_5_test_api(self):
@@ -245,8 +249,8 @@ class WallpaperDemo:
             else:
                 self.print_error(f"Packs API failed: {response.status_code}")
                 return False
-        except Exception as e:
-            self.print_error(f"Error testing packs API: {e}")
+        except Exception as exc:
+            self.print_error(f"Error testing packs API: {exc}")
             return False
 
         return True
@@ -292,13 +296,13 @@ class WallpaperDemo:
                             self.print_error(
                                 f"Shuffle API failed for {pack_name}: {shuffle_response.status_code}"
                             )
-                    except Exception as e:
-                        self.print_error(f"Error testing shuffle for {pack_name}: {e}")
+                    except Exception as exc:
+                        self.print_error(f"Error testing shuffle for {pack_name}: {exc}")
                 else:
                     self.print_info(f"Shuffle disabled for {pack_name}")
 
-        except Exception as e:
-            self.print_error(f"Error in shuffle test: {e}")
+        except Exception as exc:
+            self.print_error(f"Error in shuffle test: {exc}")
             return False
 
         return True
@@ -364,9 +368,11 @@ class WallpaperDemo:
                 self.print_error(f"Download failed: {download_response.status_code}")
                 return False
 
-        except Exception as e:
-            self.print_error(f"Error testing download: {e}")
+        except Exception as exc:
+            self.print_error(f"Error testing download: {exc}")
             return False
+
+        return None
 
     def demo_8_web_interface(self):
         """Demo 8: Show web interface info"""
@@ -389,11 +395,11 @@ class WallpaperDemo:
 
     def cleanup(self):
         """Clean up resources"""
-        if hasattr(self, "server_process"):
+        if self.server_process is not None:
             try:
                 self.server_process.terminate()
                 self.server_process.wait(timeout=5)
-            except:
+            except Exception:
                 self.server_process.kill()
 
     def run_demo(self):
@@ -434,8 +440,8 @@ class WallpaperDemo:
                 except KeyboardInterrupt:
                     self.print_error("\nDemo interrupted by user")
                     break
-                except Exception as e:
-                    self.print_error(f"Demo '{demo_name}' crashed: {e}")
+                except Exception as exc:
+                    self.print_error(f"Demo '{demo_name}' crashed: {exc}")
                     results.append((demo_name, False))
 
         finally:
@@ -472,6 +478,6 @@ class WallpaperDemo:
 
 
 if __name__ == "__main__":
-    demo = WallpaperDemo()
-    success = demo.run_demo()
-    sys.exit(0 if success else 1)
+    DEMO = WallpaperDemo()
+    SUCCESS = DEMO.run_demo()
+    sys.exit(0 if SUCCESS else 1)
