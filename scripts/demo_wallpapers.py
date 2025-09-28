@@ -230,9 +230,11 @@ class WallpaperDemo:
                     self.print_success("✅ Packs API working:")
                     print(f"  📦 Found {data['total_packs']} packs:")
                     for pack in data["packs"]:
-                        print(
-                            f"     • {pack['name']}: {pack['count']} wallpapers ({pack['size_mb']} MB)"
+                       print(
+                            f"     • {pack['name']}: {pack['count']} wallpapers "
+                            f"({pack['size_mb']} MB)"
                         )
+
                         print(
                             f"       Shuffle: {'✅' if pack['shuffle_enabled'] else '❌'} | "
                             f"New tab: {'✅' if pack['shuffle_on_new_tab'] else '❌'}"
