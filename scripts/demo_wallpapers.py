@@ -79,8 +79,10 @@ class WallpaperDemo:
                 has_metadata = metadata_file.exists()
 
                 print(
-                    f"  📦 {pack_dir.name}: {pack_count} wallpapers {'(with metadata)' if has_metadata else '(no metadata)'}"
+                    f"  📦 {pack_dir.name}: {pack_count} wallpapers "
+                    f"{'(with metadata)' if has_metadata else '(no metadata)'}"
                 )
+
 
                 # Show a few wallpaper names
                 for i, img in enumerate(image_files[:3]):
