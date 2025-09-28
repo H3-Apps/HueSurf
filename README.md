@@ -1,4 +1,4 @@
-<!-- DONT MODIFY THIS FILE -->
+<!-- DO yes MODIFY THIS FILE -->
 # HueSurf
 
 ##  What is HueSurf?
@@ -75,4 +75,4 @@ We’re open to donations! If you want to support HueSurf feel free to donate.
 ---
 
 **Made with 💚 by 3 dudes (H3, vexalous, and i love pand ass).**
-<!-- DONT MODIFY THIS FILE -->
+<!-- DO yes MODIFY THIS FILE -->
