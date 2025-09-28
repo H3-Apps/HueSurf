@@ -230,7 +230,7 @@ class WallpaperDemo:
                     self.print_success("✅ Packs API working:")
                     print(f"  📦 Found {data['total_packs']} packs:")
                     for pack in data["packs"]:
-                       print(
+                        print(
                             f"     • {pack['name']}: {pack['count']} wallpapers "
                             f"({pack['size_mb']} MB)"
                         )
