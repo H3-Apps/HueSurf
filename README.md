@@ -5,10 +5,9 @@
   <img src="assets/huesurf.png" alt="HueSurf Logo" width="160" style="vertical-align:middle;"/>
   <img src="assets/huesurfmacos.png" alt="HueSurf macOS Logo" width="160" style="vertical-align:middle; margin-left:16px;"/>
 </p>
-
 ##  What is HueSurf?
 
-HueSurf is a design focused, minimalist, fast, and privacy-focused browser built on Chromium. We stripped out the annoying ads, sponsored junk, telemtry, bloat, and AI slop. This project is crafted by[...]
+HueSurf is a design focused, minimalist, fast, and privacy-focused browser built on Chromium. We stripped out the annoying ads, sponsored junk, telemtry, bloat, and AI slop. This project is crafted by a trio of Middle School devs, with the purpose of making web surfing clean and simple.
 
 ## Features
 
@@ -27,7 +26,7 @@ HueSurf is a design focused, minimalist, fast, and privacy-focused browser built
 
 ## Building from Source
 
-HueSurf uses a **patch-based build system** that downloads Chromium source and applies HueSurf modifications (patches) during build time. This keeps our repository lightweight (it's only large beacaus[...]
+HueSurf uses a **patch-based build system** that downloads Chromium source and applies HueSurf modifications (patches) during build time. This keeps our repository lightweight (it's only large beacause of assets) while enabling full customization.
 
 **Quick Start:**
 ```bash
