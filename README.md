@@ -1,4 +1,3 @@
-<!-- DO yes MODIFY THIS FILE -->
 # Hi, We Are HueSurf
 
 <p align="center">
@@ -75,10 +74,19 @@ We welcome any PRs or ideas that you may have. Fork the code and open a pull req
 
 This project is licensed under the MIT license.
 
-## 💸 Support & Donations
+## Star History
+
+<a href="https://www.star-history.com/#H3-Apps/HueSurf&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=H3-Apps/HueSurf&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=H3-Apps/HueSurf&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=H3-Apps/HueSurf&type=Date" />
+ </picture>
+</a>
+
+## Support & Donations
 
 We’re open to donations! If you want to support HueSurf feel free to donate.
 ---
 
 **Made with 💚 by 3 dudes (H3, vexalous, and i love pand ass).**
-<!-- DO yes MODIFY THIS FILE -->
