@@ -16,18 +16,19 @@ License: MIT
 import os
 import json
 import time
-import requests
 from pathlib import Path
 import zipfile
 import tempfile
 import subprocess
 import sys
+import requests
 
 
 class WallpaperDemo:
     """Class to demonstrate HueSurf wallpaper system"""
 
     def __init__(self):
+        """Initialize the demo class and relevant paths."""
         self.project_root = Path(__file__).parent.parent
         self.assets_dir = self.project_root / "assets" / "Wallpapers"
         self.static_dir = self.project_root / "website" / "static" / "wallpapers"
@@ -36,25 +37,30 @@ class WallpaperDemo:
 
     @staticmethod
     def print_header(title):
+        """Print a header for demo sections."""
         print("\n" + "=" * 60)
         print(f"🎨 {title}")
         print("=" * 60)
 
     @staticmethod
     def print_step(step):
+        """Print a step indicator for demo progress."""
         print(f"\n📍 {step}")
         print("-" * 40)
 
     @staticmethod
     def print_success(message):
+        """Print a success message."""
         print(f"✅ {message}")
 
     @staticmethod
     def print_info(message):
+        """Print an info message."""
         print(f"ℹ️  {message}")
 
     @staticmethod
     def print_error(message):
+        """Print an error message."""
         print(f"❌ {message}")
 
     def demo_1_check_assets(self):
@@ -115,6 +121,7 @@ class WallpaperDemo:
                 capture_output=True,
                 text=True,
                 timeout=120,
+                check=False
             )
 
             if result.returncode == 0:
@@ -131,7 +138,7 @@ class WallpaperDemo:
         except subprocess.TimeoutExpired:
             self.print_error("Packer timed out")
             return False
-        except Exception as exc:
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             self.print_error(f"Error running packer: {exc}")
             return False
 
@@ -215,7 +222,7 @@ class WallpaperDemo:
             self.print_error("Server failed to start properly")
             return False
 
-        except Exception as exc:
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             self.print_error(f"Error starting server: {exc}")
             return False
 
@@ -249,7 +256,7 @@ class WallpaperDemo:
             else:
                 self.print_error(f"Packs API failed: {response.status_code}")
                 return False
-        except Exception as exc:
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             self.print_error(f"Error testing packs API: {exc}")
             return False
 
@@ -296,12 +303,11 @@ class WallpaperDemo:
                             self.print_error(
                                 f"Shuffle API failed for {pack_name}: {shuffle_response.status_code}"
                             )
-                    except Exception as exc:
+                    except requests.RequestException as exc:
                         self.print_error(f"Error testing shuffle for {pack_name}: {exc}")
                 else:
                     self.print_info(f"Shuffle disabled for {pack_name}")
-
-        except Exception as exc:
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             self.print_error(f"Error in shuffle test: {exc}")
             return False
 
@@ -368,7 +374,7 @@ class WallpaperDemo:
                 self.print_error(f"Download failed: {download_response.status_code}")
                 return False
 
-        except Exception as exc:
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             self.print_error(f"Error testing download: {exc}")
             return False
 
@@ -399,7 +405,7 @@ class WallpaperDemo:
             try:
                 self.server_process.terminate()
                 self.server_process.wait(timeout=5)
-            except Exception:
+            except Exception:  # pylint: disable=broad-exception-caught
                 self.server_process.kill()
 
     def run_demo(self):
@@ -440,7 +446,7 @@ class WallpaperDemo:
                 except KeyboardInterrupt:
                     self.print_error("\nDemo interrupted by user")
                     break
-                except Exception as exc:
+                except Exception as exc:  # pylint: disable=broad-exception-caught
                     self.print_error(f"Demo '{demo_name}' crashed: {exc}")
                     results.append((demo_name, False))
 
@@ -468,7 +474,7 @@ class WallpaperDemo:
                 f"\n⚠️  {total - passed} demos failed. Check the output above for details."
             )
 
-        print(f"\n📝 Next steps:")
+        print("\n📝 Next steps:")
         print("   • Visit the web interface to test manually")
         print("   • Integrate with HueSurf browser build")
         print("   • Add more wallpaper packs to assets folder")
