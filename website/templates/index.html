@@ -1,296 +1,172 @@
-{% extends "base.html" %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>HueSurf</title>
 
-{% block title %}{{ app_name }} - The Clean Chromium Browser{% endblock %}
+        <!-- JetBrains Mono from Google Fonts (weights used: 300 light, 800 extra-bold) -->
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,800;1,800&display=swap"
+            rel="stylesheet"
+        />
 
-{% block description %}{{ tagline }} Made by 3 dudes who got tired of bloated browsers.{% endblock %}
-
-{% block content %}
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <div style="position: relative; z-index: 2;">
-                    <h1 class="display-4 fw-bold mb-4">
-                        Meet {{ app_name }}
-                        <span class="no-bloat-badge">No Bloat</span>
-                    </h1>
-                    <p class="lead mb-4">
-                        {{ tagline }}
-                    </p>
-                    <p class="mb-4">
-                        Created by 3 dudes (and maybe a robot if Javier gets crazy!), we want this to be small but we are open to donations!!!
-                    </p>
-                    <div class="d-flex flex-wrap gap-3 mb-4">
-                        <a href="{{ github_url }}" target="_blank" class="btn btn-primary btn-lg">
-                            <i class="fab fa-github me-2"></i>Star on GitHub
-                        </a>
-                        <a href="{{ url_for('download') }}" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-download me-2"></i>Get {{ app_name }}
-                        </a>
-                    </div>
-                    <div class="d-flex flex-wrap gap-2 mb-3">
-                        <span class="badge bg-light text-dark px-3 py-2">
-                            <i class="fas fa-ban me-1"></i>No Ads
-                        </span>
-                        <span class="badge bg-light text-dark px-3 py-2">
-                            <i class="fas fa-robot me-1"></i>No AI
-                        </span>
-                        <span class="badge bg-light text-dark px-3 py-2">
-                            <i class="fas fa-feather-alt me-1"></i>Lightweight
-                        </span>
-                        <span class="badge bg-light text-dark px-3 py-2">
-                            <i class="fas fa-shield-alt me-1"></i>Privacy First
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="browser-window">
-                    <div class="browser-header">
-                        <div class="browser-dots">
-                            <div class="browser-dot red"></div>
-                            <div class="browser-dot yellow"></div>
-                            <div class="browser-dot green"></div>
-                        </div>
-                        <div class="browser-url">
-                            <i class="fas fa-lock me-2"></i>example.com - No ads, no tracking, just content
-                        </div>
-                    </div>
-                    <div class="p-4 text-center" style="background: linear-gradient(45deg, #f8f9fa 0%, #e9ecef 100%); min-height: 200px; display: flex; align-items: center; justify-content: center;">
-                        <div>
-                            <i class="fas fa-globe" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 20px;"></i>
-                            <h5>Clean, Fast, Simple</h5>
-                            <p class="text-muted mb-0">Just the web, nothing else.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Features Section -->
-<section class="section-padding bg-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto text-center mb-5">
-                <h2 class="h1 fw-bold mb-3">Why {{ app_name }}?</h2>
-                <p class="lead text-muted">
-                    We stripped out the annoying ads, sponsor junk, and all that AI nonsense. No telemetry, no bloat—just pure browsing vibes.
-                </p>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            {% for feature in features %}
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="{{ feature.icon }}"></i>
-                    </div>
-                    <h5 class="fw-bold mb-3">{{ feature.title }}</h5>
-                    <p class="text-muted">{{ feature.desc }}</p>
-                </div>
-            </div>
-            {% endfor %}
-
-            <!-- Extra feature card for Chromium base -->
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fab fa-chrome"></i>
-                    </div>
-                    <h5 class="fw-bold mb-3">Chromium-Based</h5>
-                    <p class="text-muted">All the compatibility you love, none of the bloat you hate</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Status Section -->
-<section class="section-padding">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto text-center">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-5">
-                        <div class="mb-4">
-                            <i class="fas fa-code" style="font-size: 3rem; color: var(--primary-color);"></i>
-                        </div>
-                        <h3 class="fw-bold mb-3">Currently in Development</h3>
-                        <p class="text-muted mb-4">
-                            We're working hard to bring you the cleanest browsing experience.
-                            {{ app_name }} is still in active development, but you can follow our progress and contribute!
-                        </p>
-                        <div class="row g-3 text-start">
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center mb-2">
-                                    <i class="fas fa-check text-success me-2"></i>
-                                    <span>Core Chromium integration</span>
-                                </div>
-                                <div class="d-flex align-items-center mb-2">
-                                    <i class="fas fa-check text-success me-2"></i>
-                                    <span>Ad blocking foundation</span>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-check text-success me-2"></i>
-                                    <span>Privacy enhancements</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center mb-2">
-                                    <i class="fas fa-cog text-warning me-2"></i>
-                                    <span>Building from source</span>
-                                </div>
-                                <div class="d-flex align-items-center mb-2">
-                                    <i class="fas fa-cog text-warning me-2"></i>
-                                    <span>Binary releases</span>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-cog text-warning me-2"></i>
-                                    <span>Cross-platform support</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <a href="{{ github_url }}" target="_blank" class="btn btn-primary me-2">
-                                <i class="fab fa-github me-1"></i>Follow Progress
-                            </a>
-                            <a href="{{ url_for('about') }}" class="btn btn-outline-primary">
-                                <i class="fas fa-users me-1"></i>Meet the Team
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Community Section -->
-<section class="section-padding bg-light">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h2 class="fw-bold mb-4">Join the Community</h2>
-                <p class="lead mb-4">
-                    We welcome PRs, ideas, and memes (no labubu syscall 🥲). Fork, code, open a pull request, or just vibe in the discussions.
-                </p>
-                <div class="mb-4">
-                    <p class="mb-2">
-                        <strong>⚠️ Important Notice:</strong> If Javier starts adding robots, DM us ASAP.
-                        We will spank him so hard his butt will explode of being hurt so hard.
-                    </p>
-                </div>
-                <div class="d-flex flex-wrap gap-3">
-                    <a href="{{ github_url }}" target="_blank" class="btn btn-primary">
-                        <i class="fab fa-github me-1"></i>Contribute on GitHub
-                    </a>
-                    <a href="{{ url_for('donate') }}" class="btn btn-donate">
-                        <i class="fas fa-heart me-1"></i>Support Us
-                    </a>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="text-center">
-                    <div class="mb-4">
-                        <h5 class="mb-3">The Team</h5>
-                        <div class="d-flex flex-wrap justify-content-center gap-2">
-                            {% for member in team_members %}
-                            <span class="team-member">{{ member }}</span>
-                            {% endfor %}
-                        </div>
-                        <p class="text-muted mt-3 small">
-                            (+ potentially a robot if Javier goes insane 🤖)
-                        </p>
-                    </div>
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body p-4">
-                            <h6 class="fw-bold mb-2">Project Philosophy</h6>
-                            <p class="text-muted mb-0 small">
-                                "Do what you want, just don't add ads. Or sell it with little to no difference."
-                            </p>
-                            <p class="text-muted mt-2 small">
-                                <i class="fas fa-balance-scale me-1"></i>MIT Licensed
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-// Add some fun interactions
-document.addEventListener('DOMContentLoaded', function() {
-    // Animate feature cards on scroll
-    const featureCards = document.querySelectorAll('.feature-card');
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+        <style>
+            :root {
+                --bg: #000; /* black background */
+                --fg: #fff; /* white text */
+                --gap: 28px;
+                --btn-pad: 12px 26px;
+                --radius: 8px;
             }
-        });
-    });
 
-    featureCards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`;
-        observer.observe(card);
-    });
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+                background: var(--bg);
+                color: var(--fg);
+                font-family:
+                    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
+                    monospace;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
 
-    // Add click effect to buttons
-    document.querySelectorAll('.btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            let ripple = document.createElement('span');
-            let rect = this.getBoundingClientRect();
-            let size = Math.max(rect.width, rect.height);
-            let x = e.clientX - rect.left - size / 2;
-            let y = e.clientY - rect.top - size / 2;
+            /* Center everything */
+            .wrap {
+                min-height: 100vh;
+                display: grid;
+                place-items: center;
+                text-align: center;
+                padding: 40px;
+                box-sizing: border-box;
+            }
 
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            ripple.classList.add('ripple');
+            /* Title: Hue (extra bold italic) + Surf (light) */
+            .title {
+                font-size: clamp(36px, 8vw, 84px);
+                line-height: 1;
+                margin: 0 0 24px 0;
+                letter-spacing: -0.02em;
+            }
 
-            this.appendChild(ripple);
+            .title .hue {
+                font-style: italic;
+                font-weight: 800; /* extra-bold */
+                display: inline-block;
+                margin-right: 6px;
+            }
 
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        });
-    });
-});
-</script>
+            .title .surf {
+                font-weight: 300; /* light */
+                font-style: normal;
+                display: inline-block;
+            }
 
-<style>
-.btn {
-    position: relative;
-    overflow: hidden;
-}
+            /* Buttons row */
+            .controls {
+                display: flex;
+                gap: var(--gap);
+                justify-content: center;
+                align-items: center;
+                flex-wrap: wrap;
+            }
 
-.ripple {
-    position: absolute;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.6);
-    transform: scale(0);
-    animation: ripple-animation 0.6s linear;
-    pointer-events: none;
-}
+            a.button {
+                text-decoration: none;
+                color: var(--fg);
+                border: 1px solid currentColor;
+                padding: var(--btn-pad);
+                border-radius: var(--radius);
+                font-size: 16px;
+                display: inline-block;
+                transition:
+                    transform 120ms ease,
+                    opacity 120ms ease;
+                background: transparent;
+                cursor: pointer;
+                user-select: none;
+            }
 
-@keyframes ripple-animation {
-    to {
-        transform: scale(4);
-        opacity: 0;
-    }
-}
-</style>
-{% endblock %}
+            a.button:active {
+                transform: translateY(1px) scale(0.997);
+            }
+            a.button:hover {
+                opacity: 0.9;
+                transform: translateY(-2px);
+            }
+
+            /* Subtle caption */
+            .meta {
+                margin-top: 22px;
+                font-size: 13px;
+                opacity: 0.7;
+            }
+
+            /* Respect prefers-color-scheme if user wants black on white instead */
+            @media (prefers-color-scheme: light) {
+                :root {
+                    --bg: #fff;
+                    --fg: #000;
+                }
+                a.button {
+                    background: transparent;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <main class="wrap" role="main">
+            <h1 class="title" aria-label="HueSurf">
+                <span class="hue">Hue</span><span class="surf">Surf</span>
+            </h1>
+
+            <nav
+                class="controls"
+                role="navigation"
+                aria-label="Primary actions"
+            >
+                <!-- Download: a small placeholder README file (data URI, base64) -->
+                <a
+                    class="button"
+                    href="data:application/octet-stream;base64,SHVlU3VyZgpNaW5pbWFsaXN0IGJyb3dzZXIgcGxhY2Vob2xkZXIuClZlcnNpb24gMC4xCmh0dHBzOi8vZ2l0aHViLmNvbS9IMy1BcHBzL0h1ZVN1cmYK"
+                    download="HueSurf-README.txt"
+                    role="button"
+                    aria-label="Download HueSurf placeholder"
+                >
+                    Download
+                </a>
+
+                <a
+                    class="button"
+                    href="https://discord.gg/QMuSphMAw2"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    role="button"
+                    aria-label="Open HueSurf Discord"
+                >
+                    Discord
+                </a>
+
+                <!-- GitHub button -->
+                <a
+                    class="button"
+                    href="https://github.com/H3-Apps/HueSurf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    role="button"
+                    aria-label="Open HueSurf GitHub repository"
+                >
+                    GitHub
+                </a>
+            </nav>
+
+            <p class="meta">
+                A lightweight chromium based browser without ad's, ai, sponsors,
+                or bloat.
+            </p>
+        </main>
+    </body>
+</html>
