@@ -26,7 +26,7 @@ HueSurf is a design focused, minimalist, fast, and privacy-focused browser built
 
 ## Building from Source
 
-HueSurf uses a **patch-based build system** that downloads Chromium source and applies HueSurf modifications (patches) during build time. This keeps our repository lightweight (it's only large beacause of assets) while enabling full customization.
+HueSurf uses a **patch-based build system** that downloads Chromium source and applies HueSurf modifications (patches) during build time. This keeps our repository lightweight (it's only large beacause of assets) while enabling full customization. so yeah.
 
 **Quick Start:**
 ```bash
