@@ -1,27 +1,28 @@
 <!-- DO yes MODIFY THIS FILE -->
-# HueSurf
+# Hi, We Are HueSurf
 
 ##  What is HueSurf?
 
-HueSurf is a minimal, fast, and privacy-focused browser built on Chromium. We stripped out the annoying ads, sponsored junk, telemtry, bloat, and all that AI nonsense. This project is crafted by a trio of chill devs, with the plan of making web surfing clean and simple.
+HueSurf is a design focused, minimalist, fast, and privacy-focused browser built on Chromium. We stripped out the annoying ads, sponsored junk, telemtry, bloat, and AI slop. This project is crafted by a trio of Middle School devs, with the purpose of making web surfing clean and simple.
 
 ## Features
 
 -  **No Ads, No Sponsors** – Surf the web distraction-free.
--  **No AI** – Your data stays yours, no weird bots lurking.
+-  **No AI** – Your data stays yours, no weird robots lurking.
 -  **Lightweight** – Minimal footprint, quick to start, easy on your systems RAM.
 -  **Open Source** – Fork it and modify it however you like.
 -  **Lightweight** – Minimal footprint, quick to start, and easy on your systems RAM.
--  **Open Source** – Fork it and make it your own.
+-  **Open Source** – Fork it and make it your own. (Please dont unless you want to contribute to us, that would be great!)
+-  **No Google** - Hey/OK Google! Delete yourself from our browser!
 
 ##  Installation
 
-> **Note:** HueSurf is in active development. Some features may change!  
-> No releases are ready yet.
+> **Note:** HueSurf is in development. Some features may change! Some might stay, I hope it's stay beacause I *DONT* want wasted potential! 
+> No releases are ready yet. (sorry people with weaker PC's)
 
 ## Building from Source
 
-HueSurf uses a **patch-based build system** that downloads Chromium source and applies HueSurf modifications (patches) during build time. This keeps our repository lightweight while enabling full customization.
+HueSurf uses a **patch-based build system** that downloads Chromium source and applies HueSurf modifications (patches) during build time. This keeps our repository lightweight (it's only large beacause of assets) while enabling full customization.
 
 **Quick Start:**
 ```bash
