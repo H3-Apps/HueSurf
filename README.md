@@ -5,6 +5,7 @@
   <img src="assets/huesurf.png" alt="HueSurf Logo" width="160" style="vertical-align:middle;"/>
   <img src="assets/huesurfmacos.png" alt="HueSurf macOS Logo" width="160" style="vertical-align:middle; margin-left:16px;"/>
 </p>
+
 ##  What is HueSurf?
 
 HueSurf is a design focused, minimalist, fast, and privacy-focused browser built on Chromium. We stripped out the annoying ads, sponsored junk, telemtry, bloat, and AI slop. This project is crafted by a trio of Middle School devs, with the purpose of making web surfing clean and simple.
