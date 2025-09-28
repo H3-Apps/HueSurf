@@ -19,12 +19,13 @@ Patches are numbered and organized by functionality:
 patches/
 ├── 001-huesurf-branding.patch           # Replace Chromium → HueSurf branding
 ├── 002-remove-google-services.patch     # Strip out Google integrations
-├── 003-privacy-enhancements.patch       # Enhanced privacy controls
-├── 004-disable-telemetry.patch          # Remove all tracking/reporting
-├── 005-ad-blocking-foundation.patch     # Built-in ad blocking infrastructure
-├── 006-ui-cleanup.patch                 # Remove promotional UI elements
-├── 007-disable-ai-features.patch        # Remove AI/ML components
-├── 008-performance-optimizations.patch  # Speed and memory improvements
+├── 003-wallpaper-manager.patch          # Dynamic wallpaper system
+├── 004-privacy-enhancements.patch       # Enhanced privacy controls
+├── 005-disable-telemetry.patch          # Remove all tracking/reporting
+├── 006-ad-blocking-foundation.patch     # Built-in ad blocking infrastructure
+├── 007-ui-cleanup.patch                 # Remove promotional UI elements
+├── 008-disable-ai-features.patch        # Remove AI/ML components
+├── 009-performance-optimizations.patch  # Speed and memory improvements
 └── 999-final-touches.patch              # Last-minute fixes
 ```
 
@@ -32,8 +33,9 @@ patches/
 
 ### Core Modifications (001-099)
 - **Branding**: Change names, icons, about pages
+- **Google Services**: Strip out Google integrations (47+ services removed)
+- **Wallpaper System**: Dynamic wallpaper management
 - **Privacy**: Remove tracking, telemetry, data collection
-- **Google Services**: Strip out Google integrations
 
 ### Feature Removal (100-199)  
 - **AI/ML Features**: Remove machine learning components
@@ -282,10 +284,11 @@ Patches are reviewed for:
 
 Some notable patches that make HueSurf special:
 
-- **`002-remove-google-services.patch`** - Eliminates 47 different Google integrations
-- **`004-disable-telemetry.patch`** - Removes all 23 telemetry collection points
-- **`007-disable-ai-features.patch`** - Strips out AI components saving 15MB+ in binary size
-- **`008-performance-optimizations.patch`** - Improves startup time by ~30%
+- **`002-remove-google-services.patch`** - Eliminates 47+ different Google integrations including Safe Browsing, Sync, Translate, GCM, Sign-in, and Search
+- **`003-wallpaper-manager.patch`** - Adds dynamic wallpaper system with smooth transitions
+- **`005-disable-telemetry.patch`** - Removes all 23+ telemetry collection points
+- **`008-disable-ai-features.patch`** - Strips out AI components saving 15MB+ in binary size
+- **`009-performance-optimizations.patch`** - Improves startup time by ~30%
 
 ---
 

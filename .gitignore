@@ -130,6 +130,7 @@ temp/
 *.rar
 *.tar
 *.zip
+!website/static/wallpapers/packs/*.zip
 *.tgz
 
 # === Security ===

@@ -156,10 +156,10 @@ HueSurf modifications are organized as patch files in the `patches/` directory:
 ```
 patches/
 ├── 001-huesurf-branding.patch      # Replace Chromium branding with HueSurf
-├── 002-remove-google-services.patch # Remove Google integrations
-├── 003-privacy-enhancements.patch   # Enhanced privacy settings
-├── 004-ad-blocking.patch           # Built-in ad blocking
-├── 005-ui-cleanup.patch            # Remove promotional UI elements
+├── 002-remove-google-services.patch # Remove Google integrations (47+ services)
+├── 003-wallpaper-manager.patch     # Dynamic wallpaper system
+├── 004-privacy-enhancements.patch  # Enhanced privacy settings
+├── 005-ad-blocking.patch           # Built-in ad blocking
 └── 006-performance-tweaks.patch    # Performance optimizations
 ```
 
