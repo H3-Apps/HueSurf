@@ -74,5 +74,5 @@ This project is licensed under the MIT license.
 We’re open to donations! If you want to support HueSurf feel free to donate.
 ---
 
-**Made with 💚 by 3 dudes (H3, vexalous, and i love pandass).**
+**Made with 💚 by 3 dudes (H3, vexalous, and i love pand ass).**
 <!-- DONT MODIFY THIS FILE -->
