@@ -37,7 +37,7 @@ cd HueSurf
 # Make build script executable
 chmod +x scripts/build.sh
 
-# Start the build (This takes a while!)
+# Start the build(This takes a while! 5 hours just to download on a 2019 16 inch i7 macbook pro!)
 ./scripts/build.sh
 ```
 
