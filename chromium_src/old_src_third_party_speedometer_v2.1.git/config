@@ -1,0 +1,19 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "origin"]
+	url = https://chromium.googlesource.com/external/github.com/WebKit/Speedometer.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "main-custom"]
+	remote = origin
+	merge = refs/heads/main-custom
+[diff]
+	ignoreSubmodules = dirty
+[fetch]
+	recurseSubmodules = off
+[push]
+	recurseSubmodules = off

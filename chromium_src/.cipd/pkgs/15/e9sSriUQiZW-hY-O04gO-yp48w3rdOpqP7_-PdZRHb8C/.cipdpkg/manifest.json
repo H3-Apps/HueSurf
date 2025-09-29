@@ -1,0 +1,25 @@
+{
+  "format_version": "1.1",
+  "package_name": "infra/3pp/tools/swift-format/mac-amd64",
+  "install_mode": "copy",
+  "actual_install_mode": "copy",
+  "files": [
+    {
+      "name": "LICENSE.txt",
+      "size": 11751,
+      "hash": "dwr4KR9whTjY_4haC7xOBFzXAFMXQcT5lSjUNcFNf1UC"
+    },
+    {
+      "name": "lib_InternalSwiftSyntaxParser.dylib",
+      "size": 45563072,
+      "executable": true,
+      "hash": "JQtLbAocKecSY3YOg_o5opyWOcVKwrfzM01IXB7heagC"
+    },
+    {
+      "name": "swift-format",
+      "size": 14743936,
+      "executable": true,
+      "hash": "li70LcyCCrxzle_olGY9pXzVmD63zql4q6ccfP9H5rAC"
+    }
+  ]
+}
