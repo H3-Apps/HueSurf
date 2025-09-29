@@ -1,8 +1,8 @@
 # Hi, We Are HueSurf
 
 <p align="center">
-  <img src="assets/huesurf.png" alt="HueSurf Logo" width="160" style="vertical-align:middle;"/>
-  <img src="assets/huesurfmacos.png" alt="HueSurf macOS Logo" width="160" style="vertical-align:middle; margin-left:16px;"/>
+  <img src="assets/huesurf.png" alt="HueSurf Logo" width="180" style="vertical-align:middle;"/>
+  <img src="assets/huesurfmacos.png" alt="HueSurf macOS Logo" width="180" style="vertical-align:middle; margin-left:16px;"/>
 </p>
 
 ##  What is HueSurf?
@@ -26,7 +26,7 @@ HueSurf is a design focused, minimalist, fast, and privacy-focused browser built
 
 ## Building from Source
 
-HueSurf uses a **patch-based build system** that downloads Chromium source and applies HueSurf modifications (patches) during build time. This keeps our repository lightweight (it's only large beacause of assets) while enabling full customization. so yeah.
+HueSurf uses a **patch-based build system** that downloads Chromium source and applies HueSurf modifications (patches) during build time. This keeps our repository lightweight (it's only large beacause of assets) while enabling full customization. so uhhh press play and give up your computer.
 
 **Quick Start:**
 ```bash
@@ -42,16 +42,18 @@ chmod +x scripts/build.sh
 ```
 
 **Requirements:**
-- 8GB+ RAM (16GB recommended)
-- 50GB free disk space  
+- 16GB+ RAM (24GB recommended)
+- 110GB free disk space (as of now)
 - Multi-core CPU (4+ cores recommended)
 - 1-4 hours build time (depending on hardware)
 
 **Supported Platforms:**
--  Linux (Ubuntu 18.04+, Debian 10+, CentOS 8+)
--  macOS (10.15+ Catalina or later)
--  Windows (10/11 with Visual Studio 2019+)
 
+-  Linux (Ubuntu 18.04+, Debian 10+, CentOS 8+)
+-  Temple OS
+-  MacOS (10.15+ Catalina or later BUT PLEASE PLEASE use ventura or newer.)
+-  Windows (10/11 with Visual Studio 2019+)
+-  Pebble OS 
 For detailed build instructions, see [BUILD.md](BUILD.md).
 
 ##  Project Structure
@@ -59,9 +61,9 @@ For detailed build instructions, see [BUILD.md](BUILD.md).
 ```
 HueSurf/
 ├── scripts/build.sh           # Main build orchestrator
-├── patches/                   # HueSurf modifications to Chromium
+├── patches/                   # HueSurf patches/mods to Chromium
 ├── config/                    # Build configuration files
-├── website/                   # Official HueSurf website
+├── website/                   # HueSurf website and hosting
 ├── BUILD.md                   # Comprehensive build guide
 └── dist/                      # Built browser packages (created during build)
 ```
