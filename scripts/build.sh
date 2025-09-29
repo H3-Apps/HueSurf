@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-CHROMIUM_VERSION="120.0.6099.199"  # Stable version - update as needed
+CHROMIUM_VERSION="131.0.6778.85"  # Updated to latest stable version for macOS 26 compatibility
 BUILD_DIR="$PROJECT_ROOT/chromium_src"
 DEPOT_TOOLS_DIR="$PROJECT_ROOT/depot_tools"
 PATCHES_DIR="$PROJECT_ROOT/patches"
@@ -31,7 +31,7 @@ case "$(uname -s)" in
     *)          echo -e "${RED}❌ Unsupported platform$(uname -s)${NC}" && exit 1;;
 esac
 
-echo -e "${BLUE}🌊 HueSurf Build Script${NC}"
+echo -e "${BLUE}🌊🏄‍♂️ HueSurf Build Script${NC}"
 echo -e "${BLUE}========================${NC}"
 echo -e "Platform: ${GREEN}$PLATFORM${NC}"
 echo -e "Chromium Version: ${GREEN}$CHROMIUM_VERSION${NC}"
@@ -55,6 +55,11 @@ error() {
 # Check if command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
+}
+
+# Ensure depot_tools is in PATH
+ensure_depot_tools_path() {
+    export PATH="$DEPOT_TOOLS_DIR:$PATH"
 }
 
 # Install depot_tools
@@ -81,15 +86,38 @@ install_depot_tools() {
     fi
 }
 
+# Monitor progress of long-running operations
+monitor_progress() {
+    local pid=$1
+    local desc=$2
+    local dot_count=0
+
+    echo -ne "${GREEN}[HueSurf]${NC} $desc"
+
+    while kill -0 $pid 2>/dev/null; do
+        echo -ne "."
+        dot_count=$((dot_count + 1))
+        if [ $dot_count -eq 50 ]; then
+            echo ""
+            echo -ne "${GREEN}[HueSurf]${NC} Still working on $desc"
+            dot_count=0
+        fi
+        sleep 2
+    done
+    echo ""
+}
+
 # Download Chromium source
 fetch_chromium() {
     log "Fetching Chromium source code..."
 
+    ensure_depot_tools_path
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
 
     if [ ! -d "src" ]; then
         log "Initializing Chromium checkout (this will take a while...)"
+        log "💡 This downloads the initial Chromium source (~2GB)"
         fetch --nohooks chromium
     fi
 
@@ -98,8 +126,23 @@ fetch_chromium() {
     log "Checking out Chromium version $CHROMIUM_VERSION..."
     git checkout "refs/tags/$CHROMIUM_VERSION" -b huesurf-build
 
-    log "Running gclient sync..."
-    gclient sync --with_branch_heads --with_tags
+    log "Running gclient sync (this may take 30+ minutes, downloading ~10GB)..."
+    log "💡 Tip: You can monitor progress by checking disk usage with: du -sh chromium_src/"
+
+    # Run gclient sync with progress monitoring
+    gclient sync --with_branch_heads --with_tags --verbose --jobs=4 &
+    SYNC_PID=$!
+
+    # Monitor the sync process
+    monitor_progress $SYNC_PID "Syncing Chromium source"
+
+    # Wait for the process to complete and check exit status
+    wait $SYNC_PID
+    SYNC_EXIT_CODE=$?
+
+    if [ $SYNC_EXIT_CODE -ne 0 ]; then
+        error "gclient sync failed with exit code $SYNC_EXIT_CODE"
+    fi
 
     log "✅ Chromium source fetched successfully"
 }
@@ -228,6 +271,7 @@ EOF
 build_browser() {
     log "Building HueSurf browser..."
 
+    ensure_depot_tools_path
     cd "$BUILD_DIR/src"
 
     # Generate build files
