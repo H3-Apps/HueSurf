@@ -130,7 +130,7 @@ fetch_chromium() {
     log "💡 Tip: You can monitor progress by checking disk usage with: du -sh chromium_src/"
 
     # Run gclient sync with progress monitoring
-    gclient sync --with_branch_heads --with_tags --verbose --jobs=4 &
+    gclient sync --with_branch_heads --with_tags --jobs 1 --verbose --jobs=4 &
     SYNC_PID=$!
 
     # Monitor the sync process
