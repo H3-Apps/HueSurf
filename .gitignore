@@ -1,6 +1,10 @@
 # HueSurf Build System - Git Ignore Rules
 # Made by 3 dudes who don't want 35GB+ of Chromium source in Git!
 
+# === Critical Build Directories (NEVER COMMIT) ===
+chromium_src/
+depot_tools/
+
 # === Build Directories ===
 # These contain the massive Chromium source and build artifacts
 chromium_src/           # Downloaded Chromium source (~35GB)
