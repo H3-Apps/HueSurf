@@ -1,8 +1,8 @@
 # Hi, We Are HueSurf
 
 <p align="center">
-  <img src="assets/huesurf.png" alt="HueSurf Logo" width="180" style="vertical-align:middle;"/>
-  <img src="assets/huesurfmacos.png" alt="HueSurf macOS Logo" width="180" style="vertical-align:middle; margin-left:16px;"/>
+  <img src="assets/huesurf.png" alt="HueSurf Logo" width="340" style="vertical-align:middle;"/>
+  <img src="assets/huesurfmacos.png" alt="HueSurf macOS Logo" width="340" style="vertical-align:middle; margin-left:16px;"/>
 </p>
 
 ##  What is HueSurf?
