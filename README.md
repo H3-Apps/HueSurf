@@ -70,7 +70,6 @@ chmod +x scripts/build.sh
 <h2 align=center> Project Structure </h2>
 
 ```
-</h4>
 HueSurf/
 ├── scripts/build.sh           # Main build orchestrator
 ├── patches/                   # HueSurf patches/mods to Chromium
