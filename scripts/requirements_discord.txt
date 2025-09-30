@@ -1,0 +1,11 @@
+# Discord Bot Requirements for HueSurf Build Status Bot
+# Install with: pip install -r requirements_discord.txt
+
+# Discord.py library for bot functionality
+discord.py>=2.3.0
+
+# Python-dotenv for loading environment variables from .env file
+python-dotenv>=1.0.0
+
+# Optional: Colorlog for better logging (if desired)
+# colorlog>=6.7.0
