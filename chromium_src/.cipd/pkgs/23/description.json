@@ -1,4 +1,0 @@
-{
-  "subdir": "src/third_party/updater/chromium_mac_arm64/cipd",
-  "package_name": "chromium/third_party/updater/chromium_mac_arm64"
-}
