@@ -325,7 +325,7 @@ Licensed under MIT License
         self.stats["wallpapers_processed"] += len(image_files)
 
         logger.info(
-            f"✅ Processed {pack_info['pack_name']}: {len(image_files)} wallpapers"
+            f"✅ I sucessfully packed your wallpapers for you {pack_info['pack_name']}: {len(image_files)} wallpapers"
         )
         return pack_data
 
@@ -390,7 +390,7 @@ Licensed under MIT License
 
     def pack_wallpapers(self):
         """Main method to pack all wallpapers"""
-        logger.info("🎨 Starting HueSurf Wallpaper Packer")
+        logger.info("🎨 HueSurf Wallpaper Packer")
         logger.info(f"Source: {self.source_dir}")
         logger.info(f"Output: {self.output_dir}")
 
@@ -419,7 +419,7 @@ Licensed under MIT License
         # Print statistics
         self.print_statistics()
 
-        logger.info("✅ Wallpaper packing completed successfully!")
+        logger.info("✅ Wallpaper packed!")
         return True
 
     def print_statistics(self):
