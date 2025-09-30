@@ -1,0 +1,19 @@
+{
+  "format_version": "1.1",
+  "package_name": "infra/build/siso/mac-amd64",
+  "version_file": ".versions/siso.cipd_version",
+  "actual_install_mode": "copy",
+  "files": [
+    {
+      "name": "siso",
+      "size": 42449184,
+      "executable": true,
+      "hash": "VL9B6WcVcN8Q6vPX3XnD4g3RiqMDMOT97Ht1SD4t6ccC"
+    },
+    {
+      "name": ".versions/siso.cipd_version",
+      "size": 115,
+      "hash": "Thgz8fpMZJ3MfqkAY3GV-AIhJdJb2MIdtHDJKJ0G91AC"
+    }
+  ]
+}

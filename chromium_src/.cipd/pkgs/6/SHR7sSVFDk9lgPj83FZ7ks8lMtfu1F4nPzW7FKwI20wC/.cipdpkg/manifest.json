@@ -1,0 +1,199 @@
+{
+  "format_version": "1.1",
+  "package_name": "infra/3pp/tools/httpd-php/mac-arm64",
+  "install_mode": "copy",
+  "actual_install_mode": "copy",
+  "files": [
+    {
+      "name": "LICENSE",
+      "size": 84491,
+      "hash": "Tal30gGoQYyE4Fs1eWIovG9iMMexfjbFepNwLPDrK5kC"
+    },
+    {
+      "name": "bin/httpd",
+      "size": 797704,
+      "executable": true,
+      "hash": "CJ-VGGxyFTuCSLnGpBC50da2qSbLM0bBC1iIrcVmrPYC"
+    },
+    {
+      "name": "bin/openssl",
+      "size": 649720,
+      "executable": true,
+      "hash": "PEXMAcOBYMUOo3gDf7OXciwOU8InRNnGX1pZ9WXA4icC"
+    },
+    {
+      "name": "lib/libapr-1.0.dylib",
+      "size": 281840,
+      "executable": true,
+      "hash": "j1IoPhDx-osK4dNuNjVyzB_SACG4u2latuHxfQ0WwIoC"
+    },
+    {
+      "name": "lib/libaprutil-1.0.dylib",
+      "size": 266744,
+      "executable": true,
+      "hash": "J7KJzRtNPf3WSKbR65CZLV5AfxBzjQTe_2-lElF_jR0C"
+    },
+    {
+      "name": "lib/libcrypto.1.1.dylib",
+      "size": 2065536,
+      "executable": true,
+      "hash": "vXdbmRzK9g2xjMVo-PFwHjjiNXp_NBaiXGBAX6aOVTAC"
+    },
+    {
+      "name": "lib/libexpat.1.dylib",
+      "size": 206112,
+      "executable": true,
+      "hash": "lvRXZVy72zNuX0fSh6TadvVB-iFaDPUZMHk0AJh1oiQC"
+    },
+    {
+      "name": "lib/libpcre.1.dylib",
+      "size": 145824,
+      "executable": true,
+      "hash": "ZLUWHSUVTe5xMF_qaU1BZXQfw7sp_sVVIrQW-Rj5svEC"
+    },
+    {
+      "name": "lib/libpcrecpp.0.dylib",
+      "size": 82480,
+      "executable": true,
+      "hash": "QP6x29qy1HPFl3ybV101GX3J3UuZ4eZ00VKYiL9T9pUC"
+    },
+    {
+      "name": "lib/libpcreposix.0.dylib",
+      "size": 51336,
+      "executable": true,
+      "hash": "E2RkGaWIqbVisZL9xft6VcHDIWnV2xNA4HaZ46Zk0TMC"
+    },
+    {
+      "name": "lib/libssl.1.1.dylib",
+      "size": 521344,
+      "executable": true,
+      "hash": "JM3aymKt462NeUI1M4NRRi82JmxrBpUVoZSCT0aOUigC"
+    },
+    {
+      "name": "lib/libxml2.2.dylib",
+      "size": 1575360,
+      "executable": true,
+      "hash": "pRp0UgKqL4GSVRB2te26kt4SygnOEoj286sp9ZoQIsQC"
+    },
+    {
+      "name": "lib/libz.1.dylib",
+      "size": 122688,
+      "executable": true,
+      "hash": "p-TMqS8_CreMfkhXLjTchgAaX7lESOwrx8O-LTnF2P4C"
+    },
+    {
+      "name": "libexec/apache2/libphp7.so",
+      "size": 13467112,
+      "executable": true,
+      "hash": "frPdZ6evdrSjMZvaGTkJHRHMxfa1AiHlJu95oY9G2KkC"
+    },
+    {
+      "name": "libexec/apache2/mod_access_compat.so",
+      "size": 51320,
+      "executable": true,
+      "hash": "OYetI9FHl7rqDy3Y0r7ppKYpRew1TbDIDHzAKW0nm7sC"
+    },
+    {
+      "name": "libexec/apache2/mod_actions.so",
+      "size": 51088,
+      "executable": true,
+      "hash": "5KvTkjAS59cLOvOrhCNNvsU0KSBWU23DQnlpr7GGt88C"
+    },
+    {
+      "name": "libexec/apache2/mod_alias.so",
+      "size": 52528,
+      "executable": true,
+      "hash": "QItwn9eNF_Fjx0urn1gX9UfqQCXWlAjIKBtIm41BdRIC"
+    },
+    {
+      "name": "libexec/apache2/mod_asis.so",
+      "size": 50808,
+      "executable": true,
+      "hash": "4PmjMa0WWdNKfQMBMOpyk6rGBSIdC9ZCPLvSNNun5mYC"
+    },
+    {
+      "name": "libexec/apache2/mod_authz_core.so",
+      "size": 54032,
+      "executable": true,
+      "hash": "X9bB9gURVykIsfs4-1fCDmeHVVocUnbERLp2HYygQTQC"
+    },
+    {
+      "name": "libexec/apache2/mod_authz_host.so",
+      "size": 52064,
+      "executable": true,
+      "hash": "gaDSCSKI7i6M35upZqxI-eEl3PYNK83nCXj1ZnBfXsoC"
+    },
+    {
+      "name": "libexec/apache2/mod_autoindex.so",
+      "size": 72592,
+      "executable": true,
+      "hash": "G6MYgbQ3p4g2AeFpkKYKQIz1xwhdna481vvZ4Y6Nln8C"
+    },
+    {
+      "name": "libexec/apache2/mod_cgi.so",
+      "size": 73576,
+      "executable": true,
+      "hash": "q9MzYIV_3OiUdn1kC5PYvni20DXpJHUYQyKgkFCtaWYC"
+    },
+    {
+      "name": "libexec/apache2/mod_env.so",
+      "size": 51080,
+      "executable": true,
+      "hash": "ZyRSLD1qDM5_F0LwfVF6i3P8KJ-cfFJYPXwaNBRBFcIC"
+    },
+    {
+      "name": "libexec/apache2/mod_headers.so",
+      "size": 54832,
+      "executable": true,
+      "hash": "QD7abbsAtfnDPGwfosOgTYGlJzhiYY1hQApOExU0enQC"
+    },
+    {
+      "name": "libexec/apache2/mod_imagemap.so",
+      "size": 52432,
+      "executable": true,
+      "hash": "ltvEKSqQ8-NMrxktYZAbgMJIFLgY-lF7jt9aGZSeWDUC"
+    },
+    {
+      "name": "libexec/apache2/mod_include.so",
+      "size": 106688,
+      "executable": true,
+      "hash": "8wYQnBzdYcIzXJ1oyo-0tj8ur1BHz9cMaxKyorsRZEcC"
+    },
+    {
+      "name": "libexec/apache2/mod_log_config.so",
+      "size": 74080,
+      "executable": true,
+      "hash": "rMpp9QDDubs-U5FdJlG-WyFRV96ldLcxvZOL9NNxRwYC"
+    },
+    {
+      "name": "libexec/apache2/mod_mime.so",
+      "size": 53192,
+      "executable": true,
+      "hash": "gqRtf-bPA23LPRsYcJP8qlbptzhzfkm-46hRe7y7rEUC"
+    },
+    {
+      "name": "libexec/apache2/mod_negotiation.so",
+      "size": 73168,
+      "executable": true,
+      "hash": "W003mFlSrBLdUrn5bj36Qw1rZSXqfUlohZVvHJyxCYkC"
+    },
+    {
+      "name": "libexec/apache2/mod_rewrite.so",
+      "size": 111888,
+      "executable": true,
+      "hash": "kLMo2OQj35nPl_0F_dvg89GfeR-WstFyFXcY6TS7y6MC"
+    },
+    {
+      "name": "libexec/apache2/mod_ssl.so",
+      "size": 333816,
+      "executable": true,
+      "hash": "x3o-gL2izqsg-KACInhccuLET8mrWs7hYq35QvxNYpoC"
+    },
+    {
+      "name": "libexec/apache2/mod_unixd.so",
+      "size": 51824,
+      "executable": true,
+      "hash": "icOn9512VVOWL42vWiS7C08SENVrdc9Wbxytj_c3KUMC"
+    }
+  ]
+}

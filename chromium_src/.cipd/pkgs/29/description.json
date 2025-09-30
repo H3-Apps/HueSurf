@@ -1,0 +1,4 @@
+{
+  "subdir": "src/ui/gl/resources/angle-metal",
+  "package_name": "chromium/gpu/angle-metal-shader-libraries"
+}

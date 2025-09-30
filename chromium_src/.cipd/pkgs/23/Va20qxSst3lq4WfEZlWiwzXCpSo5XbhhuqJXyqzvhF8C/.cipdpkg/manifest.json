@@ -1,0 +1,64 @@
+{
+  "format_version": "1.1",
+  "package_name": "chromium/third_party/updater/chromium_mac_arm64",
+  "install_mode": "copy",
+  "actual_install_mode": "copy",
+  "files": [
+    {
+      "name": "ChromiumUpdater_test.app/Contents/Helpers/ChromiumSoftwareUpdate.bundle/Contents/Helpers/ksadmin",
+      "size": 1882080,
+      "executable": true,
+      "hash": "m9Zb2vWYtpVdj2jUfrojVhBSfLR6dclylW6swz3_ADAC"
+    },
+    {
+      "name": "ChromiumUpdater_test.app/Contents/Helpers/ChromiumSoftwareUpdate.bundle/Contents/Helpers/ksinstall",
+      "size": 1095576,
+      "executable": true,
+      "hash": "gcFp2J0uG54QgcQrh_9uzRcBsDpGmdDe8-AIh8sKCcsC"
+    },
+    {
+      "name": "ChromiumUpdater_test.app/Contents/Helpers/ChromiumSoftwareUpdate.bundle/Contents/Info.plist",
+      "size": 1039,
+      "hash": "DqrcZD_r5tlNmYOUHoiPNyQ4BkXXKGQgixXthGM7X5sC"
+    },
+    {
+      "name": "ChromiumUpdater_test.app/Contents/Helpers/ChromiumSoftwareUpdate.bundle/Contents/MacOS/ChromiumSoftwareUpdate",
+      "size": 203880,
+      "executable": true,
+      "hash": "aUnJbaczdUc35lhjVOaV4WDKWrsZuvzEfaKpB2Wg4pMC"
+    },
+    {
+      "name": "ChromiumUpdater_test.app/Contents/Helpers/ChromiumSoftwareUpdate.bundle/Contents/Resources/ChromiumSoftwareUpdateAgent.app/Contents/Info.plist",
+      "size": 1060,
+      "hash": "dS0AUeMDAECguYG52Cs1gq1HiUL_R5FIRPvOctrcOSgC"
+    },
+    {
+      "name": "ChromiumUpdater_test.app/Contents/Helpers/ChromiumSoftwareUpdate.bundle/Contents/Resources/ChromiumSoftwareUpdateAgent.app/Contents/MacOS/ChromiumSoftwareUpdateAgent",
+      "size": 1934304,
+      "executable": true,
+      "hash": "e7kkS31TeAqkfNvDgYkpbGPkRZrtGZw0XoKQB6Kz3SkC"
+    },
+    {
+      "name": "ChromiumUpdater_test.app/Contents/Helpers/launcher",
+      "size": 207472,
+      "executable": true,
+      "hash": "7jsfldXrqhD6ksuRzV7UAOy-t_LaYmnA1dWH8ORIl0IC"
+    },
+    {
+      "name": "ChromiumUpdater_test.app/Contents/Info.plist",
+      "size": 1223,
+      "hash": "b4crXOXak18oKq9XZh13HgQ9i40XXHf8nfeIy2A_BVQC"
+    },
+    {
+      "name": "ChromiumUpdater_test.app/Contents/MacOS/ChromiumUpdater_test",
+      "size": 4814456,
+      "executable": true,
+      "hash": "nJETH0yfgK7UWQ6sEa4oAdraRYD6_-u6JkRMFicA8skC"
+    },
+    {
+      "name": "ChromiumUpdater_test.app/Contents/PkgInfo",
+      "size": 8,
+      "hash": "glAhkclISwTWhTdPmHmgBmBpxJuKyuegSwHTjQfo7KAC"
+    }
+  ]
+}
