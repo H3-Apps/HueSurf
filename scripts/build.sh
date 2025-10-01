@@ -1,7 +1,6 @@
 #!/bin/bash
-# HueSurf Build Script - Ubuntu + macOS Support
 
-set -e
+set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PLATFORM="$(uname | tr '[:upper:]' '[:lower:]')"
