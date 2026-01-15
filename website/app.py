@@ -1,11 +1,13 @@
-from flask import Flask, render_template, request, jsonify, send_file, abort
-from werkzeug.utils import secure_filename
 import os
 import zipfile
 import json
 from pathlib import Path
 import tempfile
 import shutil
+from functools import lru_cache
+
+from flask import Flask, render_template, request, jsonify, send_file, abort
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
@@ -367,51 +369,57 @@ def get_wallpaper_preview(pack_name):
         ), 500
 
 
+@lru_cache(maxsize=1)
+def _scan_wallpapers():
+    """Helper to scan wallpapers directory and cache results"""
+    wallpapers_dir = Path(__file__).parent.parent / "assets" / "Wallpapers"
+    wallpapers_list = []
+
+    if wallpapers_dir.exists():
+        for pack_dir in wallpapers_dir.iterdir():
+            if pack_dir.is_dir():
+                # Read pack info for wallpaper metadata
+                pack_info = {}
+                wallpaper_metadata = {}
+                pack_info_path = pack_dir / "pack_info.json"
+                if pack_info_path.exists():
+                    with open(pack_info_path, "r", encoding="utf-8") as f:
+                        pack_info = json.load(f)
+                        # Create lookup dictionary for wallpaper metadata
+                        for wp in pack_info.get("wallpapers", []):
+                            wallpaper_metadata[wp["filename"]] = wp
+
+                for file_path in pack_dir.rglob("*"):
+                    if file_path.is_file() and file_path.suffix.lower() in [
+                        ".png",
+                        ".jpg",
+                        ".jpeg",
+                        ".webp",
+                    ]:
+                        wp_meta = wallpaper_metadata.get(file_path.name, {})
+                        wallpapers_list.append(
+                            {
+                                "name": wp_meta.get("name", file_path.stem),
+                                "pack": pack_dir.name,
+                                "filename": file_path.name,
+                                "path": f"/api/wallpapers/single/{pack_dir.name}/{file_path.name}",
+                                "size_kb": round(
+                                    file_path.stat().st_size / 1024, 2
+                                ),
+                                "description": wp_meta.get("description", ""),
+                                "tags": wp_meta.get("tags", []),
+                            }
+                        )
+    return wallpapers_list
+
+
 @app.route("/api/wallpapers/all")
 def get_all_wallpapers():
     """Get list of all wallpapers with direct download links"""
     try:
-        wallpapers_dir = Path(__file__).parent.parent / "assets" / "Wallpapers"
-        wallpapers = []
-
-        if wallpapers_dir.exists():
-            for pack_dir in wallpapers_dir.iterdir():
-                if pack_dir.is_dir():
-                    # Read pack info for wallpaper metadata
-                    pack_info = {}
-                    wallpaper_metadata = {}
-                    pack_info_path = pack_dir / "pack_info.json"
-                    if pack_info_path.exists():
-                        with open(pack_info_path, "r") as f:
-                            pack_info = json.load(f)
-                            # Create lookup dictionary for wallpaper metadata
-                            for wp in pack_info.get("wallpapers", []):
-                                wallpaper_metadata[wp["filename"]] = wp
-
-                    for file_path in pack_dir.rglob("*"):
-                        if file_path.is_file() and file_path.suffix.lower() in [
-                            ".png",
-                            ".jpg",
-                            ".jpeg",
-                            ".webp",
-                        ]:
-                            wp_meta = wallpaper_metadata.get(file_path.name, {})
-                            wallpapers.append(
-                                {
-                                    "name": wp_meta.get("name", file_path.stem),
-                                    "pack": pack_dir.name,
-                                    "filename": file_path.name,
-                                    "path": f"/api/wallpapers/single/{pack_dir.name}/{file_path.name}",
-                                    "size_kb": round(
-                                        file_path.stat().st_size / 1024, 2
-                                    ),
-                                    "description": wp_meta.get("description", ""),
-                                    "tags": wp_meta.get("tags", []),
-                                }
-                            )
-
+        wallpapers_list = _scan_wallpapers()
         return jsonify(
-            {"success": True, "wallpapers": wallpapers, "total": len(wallpapers)}
+            {"success": True, "wallpapers": wallpapers_list, "total": len(wallpapers_list)}
         )
     except Exception as e:
         return jsonify(
