@@ -9,6 +9,11 @@ from functools import lru_cache
 
 app = Flask(__name__)
 
+# Cache for wallpaper packs
+_PACKS_CACHE = None
+_PACKS_CACHE_TIME = 0
+_CACHE_DURATION = 300  # 5 minutes
+
 # Configuration
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "your-secret-key-here")
 app.config["DEBUG"] = os.environ.get("FLASK_ENV") == "development"
@@ -130,6 +135,64 @@ def contact():
         ), 500
 
 
+def _scan_wallpaper_packs(wallpapers_dir):
+    """Scan wallpaper packs directory with caching"""
+    global _PACKS_CACHE, _PACKS_CACHE_TIME
+
+    current_time = time.time()
+
+    # Return cached data if valid
+    if _PACKS_CACHE is not None and (current_time - _PACKS_CACHE_TIME) < _CACHE_DURATION:
+        return _PACKS_CACHE
+
+    packs = []
+    if wallpapers_dir.exists():
+        for pack_dir in wallpapers_dir.iterdir():
+            if pack_dir.is_dir():
+                # Read pack metadata if available
+                pack_info = {}
+                pack_info_path = pack_dir / "pack_info.json"
+                if pack_info_path.exists():
+                    try:
+                        with open(pack_info_path, "r", encoding="utf-8") as f:
+                            pack_info = json.load(f)
+                    except Exception:
+                        pass
+
+                # Count wallpapers in pack
+                wallpaper_count = len(
+                    list(pack_dir.glob("*.png"))
+                    + list(pack_dir.glob("*.jpg"))
+                    + list(pack_dir.glob("*.jpeg"))
+                )
+
+                # Calculate pack size
+                pack_size = sum(
+                    f.stat().st_size for f in pack_dir.rglob("*") if f.is_file()
+                )
+
+                packs.append(
+                    {
+                        "id": pack_dir.name.lower().replace(" ", "_"),
+                        "name": pack_dir.name,
+                        "count": wallpaper_count,
+                        "size_mb": round(pack_size / (1024 * 1024), 2),
+                        "preview": f"/api/wallpapers/preview/{pack_dir.name}",
+                        "description": pack_info.get(
+                            "description", "Wallpaper pack for HueSurf browser"
+                        ),
+                        "shuffle_enabled": pack_info.get("shuffle_enabled", False),
+                        "shuffle_on_new_tab": pack_info.get(
+                            "shuffle_on_new_tab", False
+                        ),
+                    }
+                )
+
+    _PACKS_CACHE = packs
+    _PACKS_CACHE_TIME = current_time
+    return packs
+
+
 @app.route("/api/wallpapers/packs")
 def get_wallpaper_packs():
     """Get list of available wallpaper packs from static manifest"""
@@ -185,46 +248,7 @@ def get_wallpaper_packs():
 
         # Fallback to assets directory scanning
         wallpapers_dir = Path(__file__).parent.parent / "assets" / "Wallpapers"
-        packs = []
-
-        if wallpapers_dir.exists():
-            for pack_dir in wallpapers_dir.iterdir():
-                if pack_dir.is_dir():
-                    # Read pack metadata if available
-                    pack_info = {}
-                    pack_info_path = pack_dir / "pack_info.json"
-                    if pack_info_path.exists():
-                        with open(pack_info_path, "r") as f:
-                            pack_info = json.load(f)
-
-                    # Count wallpapers in pack
-                    wallpaper_count = len(
-                        list(pack_dir.glob("*.png"))
-                        + list(pack_dir.glob("*.jpg"))
-                        + list(pack_dir.glob("*.jpeg"))
-                    )
-
-                    # Calculate pack size
-                    pack_size = sum(
-                        f.stat().st_size for f in pack_dir.rglob("*") if f.is_file()
-                    )
-
-                    packs.append(
-                        {
-                            "id": pack_dir.name.lower().replace(" ", "_"),
-                            "name": pack_dir.name,
-                            "count": wallpaper_count,
-                            "size_mb": round(pack_size / (1024 * 1024), 2),
-                            "preview": f"/api/wallpapers/preview/{pack_dir.name}",
-                            "description": pack_info.get(
-                                "description", "Wallpaper pack for HueSurf browser"
-                            ),
-                            "shuffle_enabled": pack_info.get("shuffle_enabled", False),
-                            "shuffle_on_new_tab": pack_info.get(
-                                "shuffle_on_new_tab", False
-                            ),
-                        }
-                    )
+        packs = _scan_wallpaper_packs(wallpapers_dir)
 
         return jsonify({"success": True, "packs": packs, "total_packs": len(packs)})
     except Exception as e:
@@ -286,6 +310,40 @@ def download_wallpaper_pack(pack_name):
                         ]:
                             arcname = f"{pack_name}/{file_path.relative_to(pack_dir)}"
                             zipf.write(file_path, arcname)
+
+                    # Add metadata
+                    pack_info_path = pack_dir / "pack_info.json"
+                    if pack_info_path.exists():
+                        with open(pack_info_path, "r") as f:
+                            metadata = json.load(f)
+                    else:
+                        metadata = {
+                            "pack_name": pack_name,
+                            "version": "1.0.0",
+                            "author": "HueSurf Team",
+                            "description": f"{pack_name} wallpaper pack for HueSurf browser",
+                            "shuffle_enabled": True,
+                            "shuffle_on_new_tab": True,
+                            "count": len(
+                                list(pack_dir.glob("*.png"))
+                                + list(pack_dir.glob("*.jpg"))
+                                + list(pack_dir.glob("*.jpeg"))
+                            ),
+                            "settings": {
+                                "shuffle_interval": "new_tab",
+                                "transition_effect": "fade",
+                                "transition_duration": 500,
+                                "allow_user_shuffle": True,
+                                "remember_last_wallpaper": False,
+                            },
+                        }
+                    zipf.writestr(
+                        f"{pack_name}/pack_info.json", json.dumps(metadata, indent=2)
+                    )
+
+            # Atomic move
+            os.replace(temp_zip_path, static_zip_path)
+
 
                     # Add metadata
                     pack_info_path = pack_dir / "pack_info.json"
