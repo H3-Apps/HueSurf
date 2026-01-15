@@ -134,7 +134,6 @@ temp/
 *.rar
 *.tar
 *.zip
-!website/static/wallpapers/packs/*.zip
 *.tgz
 
 # === Security ===
@@ -149,6 +148,9 @@ secrets.json
 .env.*.local
 
 # === HueSurf Specific ===
+# Ignore generated wallpaper packs and manifest
+/website/static/wallpapers/
+
 # Custom build configurations (keep template, ignore local)
 config/local_args.gn
 config/debug_args.gn
