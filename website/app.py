@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import tempfile
 import shutil
+from functools import lru_cache
 
 app = Flask(__name__)
 
@@ -367,6 +368,16 @@ def get_wallpaper_preview(pack_name):
         ), 500
 
 
+@lru_cache(maxsize=128)
+def read_pack_info(pack_info_path_str):
+    """Read pack info from json file with caching"""
+    path = Path(pack_info_path_str)
+    if path.exists():
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+
 @app.route("/api/wallpapers/all")
 def get_all_wallpapers():
     """Get list of all wallpapers with direct download links"""
@@ -381,12 +392,12 @@ def get_all_wallpapers():
                     pack_info = {}
                     wallpaper_metadata = {}
                     pack_info_path = pack_dir / "pack_info.json"
-                    if pack_info_path.exists():
-                        with open(pack_info_path, "r") as f:
-                            pack_info = json.load(f)
-                            # Create lookup dictionary for wallpaper metadata
-                            for wp in pack_info.get("wallpapers", []):
-                                wallpaper_metadata[wp["filename"]] = wp
+
+                    pack_info = read_pack_info(str(pack_info_path))
+
+                    # Create lookup dictionary for wallpaper metadata
+                    for wp in pack_info.get("wallpapers", []):
+                        wallpaper_metadata[wp["filename"]] = wp
 
                     for file_path in pack_dir.rglob("*"):
                         if file_path.is_file() and file_path.suffix.lower() in [
