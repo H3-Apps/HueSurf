@@ -135,13 +135,10 @@ async def stream_build_process(interaction, build_command):
     """Stream build process output to Discord"""
     try:
         # Start the build process
-        process = subprocess.Popen(
+        process = await asyncio.create_subprocess_shell(
             build_command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True,
-            bufsize=1,
-            shell=True,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
             cwd="../",  # Run from HueSurf root directory
         )
 
@@ -158,12 +155,13 @@ async def stream_build_process(interaction, build_command):
 
         # Stream output
         while True:
-            line = process.stdout.readline()
-            if not line and process.poll() is not None:
+            line_bytes = await process.stdout.readline()
+            if not line_bytes:
                 break
 
+            line = line_bytes.decode('utf-8', errors='replace').strip()
+
             if line:
-                line = line.strip()
                 bot.log_buffer.append(line)
 
                 # Try to extract progress
@@ -194,7 +192,7 @@ async def stream_build_process(interaction, build_command):
                         logger.error(f"Error updating message: {e}")
 
         # Process finished
-        return_code = process.wait()
+        return_code = await process.wait()
 
         if return_code == 0:
             bot.build_status = "Complete"
