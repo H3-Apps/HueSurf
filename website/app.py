@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, send_file, abort
+from werkzeug.utils import secure_filename
 import os
 import zipfile
 import json
@@ -236,6 +237,9 @@ def get_wallpaper_packs():
 def download_wallpaper_pack(pack_name):
     """Download a wallpaper pack as a zip file from static files"""
     try:
+        # 🛡️ Sanitize user input to prevent path traversal
+        pack_name = secure_filename(pack_name)
+
         # Try static files first
         static_zip_path = (
             Path(__file__).parent
@@ -328,6 +332,9 @@ def download_wallpaper_pack(pack_name):
 def get_wallpaper_preview(pack_name):
     """Get preview image for a wallpaper pack"""
     try:
+        # 🛡️ Sanitize user input to prevent path traversal
+        pack_name = secure_filename(pack_name)
+
         # Try static preview first
         static_preview_path = (
             Path(__file__).parent
@@ -416,6 +423,10 @@ def get_all_wallpapers():
 def get_single_wallpaper(pack_name, filename):
     """Download a single wallpaper file"""
     try:
+        # 🛡️ Sanitize user input to prevent path traversal
+        pack_name = secure_filename(pack_name)
+        filename = secure_filename(filename)
+
         wallpapers_dir = Path(__file__).parent.parent / "assets" / "Wallpapers"
         file_path = wallpapers_dir / pack_name / filename
 
@@ -436,6 +447,9 @@ def get_single_wallpaper(pack_name, filename):
 def get_random_wallpaper(pack_name):
     """Get a random wallpaper from the specified pack"""
     try:
+        # 🛡️ Sanitize user input to prevent path traversal
+        pack_name = secure_filename(pack_name)
+
         import random
 
         wallpapers_dir = Path(__file__).parent.parent / "assets" / "Wallpapers"
