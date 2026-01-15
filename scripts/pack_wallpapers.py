@@ -24,6 +24,9 @@ import hashlib
 import mimetypes
 from PIL import Image
 import logging
+import time
+from concurrent.futures import ProcessPoolExecutor, as_completed
+import multiprocessing
 
 # Configure logging
 logging.basicConfig(
@@ -175,7 +178,11 @@ class WallpaperPacker:
 
         if zip_path.exists() and not self.force:
             logger.info(f"Zip already exists: {zip_path} (use --force to overwrite)")
-            return zip_path
+            # If the zip exists, we still need to return its size for stats
+            try:
+                return zip_path, zip_path.stat().st_size, False
+            except FileNotFoundError:
+                return None, 0, False
 
         try:
             with zipfile.ZipFile(
@@ -215,16 +222,15 @@ Licensed under MIT License
 """
                 zipf.writestr(f"{pack_name}/README.md", readme_content)
 
-            self.stats["zips_created"] += 1
-            self.stats["total_size"] += zip_path.stat().st_size
+            zip_size = zip_path.stat().st_size
             logger.info(
-                f"Created zip: {zip_path} ({zip_path.stat().st_size / 1024 / 1024:.1f} MB)"
+                f"Created zip: {zip_path} ({zip_size / 1024 / 1024:.1f} MB)"
             )
-            return zip_path
+            return zip_path, zip_size, True
 
         except Exception as e:
             logger.error(f"Failed to create zip for {pack_name}: {e}")
-            return None
+            return None, 0, False
 
     def create_preview_image(self, pack_dir, image_files, pack_name):
         """Create a preview image for the pack"""
@@ -234,10 +240,10 @@ Licensed under MIT License
 
         if preview_path.exists() and not self.force:
             logger.debug(f"Preview already exists: {preview_path}")
-            return preview_path
+            return preview_path, False
 
         if not image_files:
-            return None
+            return None, False
 
         # Use the first image as preview
         first_image = image_files[0]
@@ -248,16 +254,15 @@ Licensed under MIT License
         if self.create_thumbnail(first_image, thumb_path):
             # Copy thumbnail as preview
             shutil.copy2(thumb_path, preview_path)
-            self.stats["previews_created"] += 1
             logger.debug(f"Created preview: {preview_path}")
-            return preview_path
+            return preview_path, True
 
-        return None
+        return None, False
 
     def process_pack(self, pack_dir):
         """Process a single wallpaper pack"""
         if not pack_dir.is_dir():
-            return None
+            return None, None
 
         logger.info(f"Processing pack: {pack_dir.name}")
 
@@ -265,18 +270,18 @@ Licensed under MIT License
         image_files = self.get_image_files(pack_dir)
         if not image_files:
             logger.warning(f"No image files found in {pack_dir.name}")
-            return None
+            return None, None
 
         # Load pack information
         pack_info = self.load_pack_info(pack_dir)
 
         # Create zip file (pack_info won't be modified)
-        zip_path = self.create_pack_zip(pack_dir, pack_info, image_files)
+        zip_path, zip_size, zip_created = self.create_pack_zip(pack_dir, pack_info, image_files)
         if not zip_path:
-            return None
+            return None, None
 
         # Create preview image
-        preview_path = self.create_preview_image(
+        preview_path, preview_created = self.create_preview_image(
             pack_dir, image_files, pack_info["pack_name"]
         )
 
@@ -289,8 +294,8 @@ Licensed under MIT License
                 "id": pack_info["pack_name"].lower().replace(" ", "_"),
                 "name": pack_info["pack_name"],
                 "count": len(image_files),
-                "size_bytes": zip_path.stat().st_size,
-                "size_mb": round(zip_path.stat().st_size / 1024 / 1024, 2),
+                "size_bytes": zip_size,
+                "size_mb": round(zip_size / 1024 / 1024, 2),
                 "download_url": f"/static/wallpapers/packs/{zip_path.name}",
                 "preview_url": f"/static/wallpapers/previews/{preview_path.name}"
                 if preview_path
@@ -321,13 +326,18 @@ Licensed under MIT License
             },
         )
 
-        self.stats["packs_processed"] += 1
-        self.stats["wallpapers_processed"] += len(image_files)
+        pack_stats = {
+            "packs_processed": 1,
+            "wallpapers_processed": len(image_files),
+            "zips_created": 1 if zip_created else 0,
+            "previews_created": 1 if preview_created else 0,
+            "total_size": zip_size,
+        }
 
         logger.info(
-            f"✅ I sucessfully packed your wallpapers for you {pack_info['pack_name']}: {len(image_files)} wallpapers"
+            f"✅ Finished processing pack {pack_info['pack_name']}: {len(image_files)} wallpapers"
         )
-        return pack_data
+        return pack_data, pack_stats
 
     def generate_manifest(self, packs_data):
         """Generate manifest file for the website"""
@@ -401,17 +411,37 @@ Licensed under MIT License
         # Ensure output directories exist
         self.ensure_directories()
 
-        # Process all wallpaper packs
+        # Process all wallpaper packs in parallel
         packs_data = []
-        for pack_dir in self.source_dir.iterdir():
-            if pack_dir.is_dir():
-                pack_data = self.process_pack(pack_dir)
-                if pack_data:
-                    packs_data.append(pack_data)
+        pack_dirs = [d for d in self.source_dir.iterdir() if d.is_dir()]
+
+        # Using ProcessPoolExecutor for CPU-bound tasks (image processing, zipping)
+        # Use half the available CPUs to avoid hogging the system, with a minimum of 1
+        max_workers = max(1, multiprocessing.cpu_count() // 2)
+        logger.info(f"🚀 Starting parallel processing with up to {max_workers} workers...")
+
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all pack processing tasks
+            future_to_pack = {executor.submit(self.process_pack, pack_dir): pack_dir for pack_dir in pack_dirs}
+
+            for future in as_completed(future_to_pack):
+                pack_dir = future_to_pack[future]
+                try:
+                    pack_data, pack_stats = future.result()
+                    if pack_data and pack_stats:
+                        packs_data.append(pack_data)
+                        # Aggregate stats
+                        for key, value in pack_stats.items():
+                            self.stats[key] += value
+                except Exception as exc:
+                    logger.error(f"{pack_dir.name} generated an exception: {exc}")
 
         if not packs_data:
-            logger.warning("No wallpaper packs were processed")
+            logger.warning("No wallpaper packs were processed successfully")
             return False
+
+        # Sort packs by name for consistent manifest generation
+        packs_data.sort(key=lambda p: p["name"])
 
         # Generate manifest file
         self.generate_manifest(packs_data)
@@ -419,7 +449,7 @@ Licensed under MIT License
         # Print statistics
         self.print_statistics()
 
-        logger.info("✅ Wallpaper packed!")
+        logger.info("✅ All wallpaper packs processed successfully!")
         return True
 
     def print_statistics(self):
@@ -448,6 +478,8 @@ def main():
 
     args = parser.parse_args()
 
+    start_time = time.time()
+
     try:
         packer = WallpaperPacker(
             source_dir=args.source,
@@ -457,6 +489,11 @@ def main():
         )
 
         success = packer.pack_wallpapers()
+
+        end_time = time.time()
+        duration = end_time - start_time
+        logger.info(f"Total execution time: {duration:.2f} seconds")
+
         exit(0 if success else 1)
 
     except KeyboardInterrupt:
@@ -468,4 +505,6 @@ def main():
 
 
 if __name__ == "__main__":
+    # Ensure the script can be used with multiprocessing on platforms that need it (e.g., Windows)
+    multiprocessing.freeze_support()
     main()
