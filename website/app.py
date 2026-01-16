@@ -10,7 +10,9 @@ from functools import lru_cache
 app = Flask(__name__)
 
 # Configuration
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "your-secret-key-here")
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+if not app.config["SECRET_KEY"]:
+    raise ValueError("No SECRET_KEY set for Flask application")
 app.config["DEBUG"] = os.environ.get("FLASK_ENV") == "development"
 
 
