@@ -74,6 +74,11 @@ def wallpapers():
 @app.route("/api/wallpapers/repack")
 def repack_wallpapers():
     """Trigger repacking of wallpapers to static folder"""
+    # 🛡️ Sentinel: This endpoint is for development only and should not be exposed in production.
+    # It triggers a potentially long-running and resource-intensive process which could be
+    # exploited for a Denial of Service (DoS) attack.
+    if not app.config["DEBUG"]:
+        abort(403, description="This endpoint is not available in production.")
     try:
         import subprocess
         import sys
