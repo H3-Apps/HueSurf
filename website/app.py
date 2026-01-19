@@ -74,6 +74,10 @@ def wallpapers():
 @app.route("/api/wallpapers/repack")
 def repack_wallpapers():
     """Trigger repacking of wallpapers to static folder"""
+    # 🛡️ Sentinel: This is a resource-intensive operation and should only be available in debug mode.
+    # Exposing this in production creates a Denial of Service (DoS) vulnerability.
+    if not app.config["DEBUG"]:
+        abort(403, description="This endpoint is only available in debug mode.")
     try:
         import subprocess
         import sys
