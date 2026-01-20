@@ -74,6 +74,8 @@ def wallpapers():
 @app.route("/api/wallpapers/repack")
 def repack_wallpapers():
     """Trigger repacking of wallpapers to static folder"""
+    if not app.config["DEBUG"]:
+        abort(403)
     try:
         import subprocess
         import sys
