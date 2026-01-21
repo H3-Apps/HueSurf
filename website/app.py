@@ -469,6 +469,8 @@ def get_all_wallpapers():
         ), 500
 
 
+
+
 @app.route("/api/wallpapers/single/<pack_name>/<filename>")
 def get_single_wallpaper(pack_name, filename):
     """Download a single wallpaper file"""
@@ -493,6 +495,18 @@ def get_single_wallpaper(pack_name, filename):
         ), 500
 
 
+@lru_cache(maxsize=32)
+def _get_images_in_pack(pack_dir):
+    """Helper to scan a pack directory for images, cached to avoid repeated IO."""
+    # ⚡ Bolt: Caching this function is critical for performance.
+    # The filesystem scan is expensive, and wallpaper packs don't change during runtime.
+    # Caching this significantly speeds up the random wallpaper endpoint.
+    images = []
+    for ext in [".png", ".jpg", ".jpeg", ".webp"]:
+        images.extend(list(pack_dir.glob(f"*{ext}")))
+    return images
+
+
 @app.route("/api/wallpapers/shuffle/<pack_name>")
 def get_random_wallpaper(pack_name):
     """Get a random wallpaper from the specified pack"""
@@ -508,10 +522,8 @@ def get_random_wallpaper(pack_name):
         if not pack_dir.exists() or not pack_dir.is_dir():
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
-        # Find all image files
-        images = []
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images.extend(list(pack_dir.glob(f"*{ext}")))
+        # Find all image files using the cached helper
+        images = _get_images_in_pack(pack_dir)
 
         if not images:
             abort(404, description="No wallpapers found in pack")
