@@ -493,6 +493,26 @@ def get_single_wallpaper(pack_name, filename):
         ), 500
 
 
+# ⚡ Bolt: Cache the filesystem scan for images in a pack.
+# This avoids expensive I/O on every request for a random wallpaper.
+# Impact: Reduces response time significantly after the first hit for a given pack.
+@lru_cache(maxsize=32)  # Cache results for up to 32 wallpaper packs
+def _get_cached_images_in_pack(pack_name):
+    """Helper to scan a wallpaper pack directory and cache the list of images."""
+    wallpapers_dir = Path(__file__).parent.parent / "assets" / "Wallpapers"
+    pack_dir = wallpapers_dir / pack_name
+
+    if not pack_dir.exists() or not pack_dir.is_dir():
+        # Return None to indicate the pack is not found
+        return None
+
+    # Find all image files
+    images = []
+    for ext in [".png", ".jpg", ".jpeg", ".webp"]:
+        images.extend(list(pack_dir.glob(f"*{ext}")))
+    return images
+
+
 @app.route("/api/wallpapers/shuffle/<pack_name>")
 def get_random_wallpaper(pack_name):
     """Get a random wallpaper from the specified pack"""
@@ -502,16 +522,10 @@ def get_random_wallpaper(pack_name):
 
         import random
 
-        wallpapers_dir = Path(__file__).parent.parent / "assets" / "Wallpapers"
-        pack_dir = wallpapers_dir / pack_name
+        images = _get_cached_images_in_pack(pack_name)
 
-        if not pack_dir.exists() or not pack_dir.is_dir():
+        if images is None:
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
-
-        # Find all image files
-        images = []
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images.extend(list(pack_dir.glob(f"*{ext}")))
 
         if not images:
             abort(404, description="No wallpapers found in pack")
@@ -519,11 +533,15 @@ def get_random_wallpaper(pack_name):
         # Select random wallpaper
         random_image = random.choice(images)
 
+        # Define pack_dir for metadata reading
+        wallpapers_dir = Path(__file__).parent.parent / "assets" / "Wallpapers"
+        pack_dir = wallpapers_dir / pack_name
+
         # Read pack info for metadata
         pack_info_path = pack_dir / "pack_info.json"
         wallpaper_meta = {}
         if pack_info_path.exists():
-            with open(pack_info_path, "r") as f:
+            with open(pack_info_path, "r", encoding='utf-8') as f:
                 pack_info = json.load(f)
                 for wp in pack_info.get("wallpapers", []):
                     if wp["filename"] == random_image.name:
