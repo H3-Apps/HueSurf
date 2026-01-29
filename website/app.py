@@ -203,60 +203,58 @@ def _scan_wallpaper_packs(wallpapers_dir):
 def get_wallpaper_packs():
     """Get list of available wallpaper packs from static manifest"""
     try:
-        # Try to read from static manifest first
         manifest_path = (
             Path(__file__).parent / "static" / "wallpapers" / "manifest.json"
         )
 
-        if manifest_path.exists():
-            with open(manifest_path, "r") as f:
-                manifest = json.load(f)
+        if not manifest_path.exists():
+            # ⚡ Bolt: If manifest is missing, return empty list instead of slow scan.
+            # This ensures consistent, fast responses. The manifest is the source of truth.
+            return jsonify({"success": True, "packs": [], "total_packs": 0})
 
-            packs = []
-            for pack in manifest.get("packs", []):
-                pack_data = {
-                    "id": pack.get(
-                        "id", pack.get("pack_name", "").lower().replace(" ", "_")
-                    ),
-                    "name": pack.get("name", pack.get("pack_name")),
-                    "count": pack.get("count", 0),
-                    "size_mb": pack.get("size_mb", 0),
-                    "preview": pack.get("preview_url", ""),
-                    "description": pack.get("description", ""),
-                    "shuffle_enabled": pack.get("shuffle_enabled", False),
-                    "shuffle_on_new_tab": pack.get("shuffle_on_new_tab", False),
-                    "download_url": pack.get("download_url", ""),
-                    "category": pack.get("category", "General"),
-                    "author": pack.get("author", "Unknown"),
-                    "version": pack.get("version", "1.0.0"),
-                    "created_date": pack.get("created_date"),
-                    "colors": pack.get("colors", {}),
-                    "recommended_for": pack.get("recommended_for", []),
-                    "min_resolution": pack.get("min_resolution", "1920x1080"),
-                    "license": pack.get("license", "MIT"),
-                    "settings": pack.get("settings", {}),
-                    "wallpapers": pack.get("wallpapers", []),
-                    "size_bytes": pack.get("size_bytes", 0),
-                    "hash": pack.get("hash", ""),
-                    "packed_date": pack.get("packed_date"),
-                }
-                packs.append(pack_data)
+        with open(manifest_path, "r", encoding="utf-8") as f:
+            manifest = json.load(f)
 
-            return jsonify(
-                {
-                    "success": True,
-                    "packs": packs,
-                    "total_packs": len(packs),
-                    "manifest_version": manifest.get("version"),
-                    "generated": manifest.get("generated"),
-                }
-            )
+        packs = []
+        for pack in manifest.get("packs", []):
+            pack_data = {
+                "id": pack.get(
+                    "id", pack.get("pack_name", "").lower().replace(" ", "_")
+                ),
+                "name": pack.get("name", pack.get("pack_name")),
+                "count": pack.get("count", 0),
+                "size_mb": pack.get("size_mb", 0),
+                "preview": pack.get("preview_url", ""),
+                "description": pack.get("description", ""),
+                "shuffle_enabled": pack.get("shuffle_enabled", False),
+                "shuffle_on_new_tab": pack.get("shuffle_on_new_tab", False),
+                "download_url": pack.get("download_url", ""),
+                "category": pack.get("category", "General"),
+                "author": pack.get("author", "Unknown"),
+                "version": pack.get("version", "1.0.0"),
+                "created_date": pack.get("created_date"),
+                "colors": pack.get("colors", {}),
+                "recommended_for": pack.get("recommended_for", []),
+                "min_resolution": pack.get("min_resolution", "1920x1080"),
+                "license": pack.get("license", "MIT"),
+                "settings": pack.get("settings", {}),
+                "wallpapers": pack.get("wallpapers", []),
+                "size_bytes": pack.get("size_bytes", 0),
+                "hash": pack.get("hash", ""),
+                "packed_date": pack.get("packed_date"),
+            }
+            packs.append(pack_data)
 
-        # Fallback to assets directory scanning
-        wallpapers_dir = Path(__file__).parent.parent / "assets" / "Wallpapers"
-        packs = _scan_wallpaper_packs(wallpapers_dir)
+        return jsonify(
+            {
+                "success": True,
+                "packs": packs,
+                "total_packs": len(packs),
+                "manifest_version": manifest.get("version"),
+                "generated": manifest.get("generated"),
+            }
+        )
 
-        return jsonify({"success": True, "packs": packs, "total_packs": len(packs)})
     except Exception as e:
         return jsonify(
             {"success": False, "message": f"Error fetching wallpaper packs: {str(e)}"}
