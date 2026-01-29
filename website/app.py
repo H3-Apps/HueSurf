@@ -451,6 +451,17 @@ def _scan_wallpapers():
     return wallpapers_list
 
 
+@lru_cache(maxsize=32)
+def _get_images_in_pack(pack_path):
+    """Helper to get all images in a pack directory with caching"""
+    images = []
+    if pack_path.exists() and pack_path.is_dir():
+        for f in pack_path.iterdir():
+            if f.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"} and f.is_file():
+                images.append(f)
+    return tuple(images)
+
+
 # ⚡ Bolt: Cache the wallpaper list to avoid expensive filesystem scans on every request.
 # This endpoint's data changes infrequently, making it a perfect candidate for in-memory caching.
 # Impact: Reduces response time from ~150ms to <5ms after the first hit.
@@ -509,9 +520,7 @@ def get_random_wallpaper(pack_name):
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
         # Find all image files
-        images = []
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images.extend(list(pack_dir.glob(f"*{ext}")))
+        images = _get_images_in_pack(pack_dir)
 
         if not images:
             abort(404, description="No wallpapers found in pack")
@@ -523,7 +532,7 @@ def get_random_wallpaper(pack_name):
         pack_info_path = pack_dir / "pack_info.json"
         wallpaper_meta = {}
         if pack_info_path.exists():
-            with open(pack_info_path, "r") as f:
+            with open(pack_info_path, "r", encoding="utf-8") as f:
                 pack_info = json.load(f)
                 for wp in pack_info.get("wallpapers", []):
                     if wp["filename"] == random_image.name:
