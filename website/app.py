@@ -165,17 +165,24 @@ def _scan_wallpaper_packs(wallpapers_dir):
                     except Exception:
                         pass
 
-                # Count wallpapers in pack
-                wallpaper_count = len(
-                    list(pack_dir.glob("*.png"))
-                    + list(pack_dir.glob("*.jpg"))
-                    + list(pack_dir.glob("*.jpeg"))
-                )
+                # Count wallpapers in pack and calculate size (single pass optimization)
+                wallpaper_count = 0
+                pack_size = 0
+                pack_dir_str = str(pack_dir)
 
-                # Calculate pack size
-                pack_size = sum(
-                    f.stat().st_size for f in pack_dir.rglob("*") if f.is_file()
-                )
+                for root, _, files in os.walk(pack_dir):
+                    for name in files:
+                        try:
+                            file_path = os.path.join(root, name)
+                            pack_size += os.path.getsize(file_path)
+
+                            # Check for wallpapers only in the root directory
+                            if root == pack_dir_str and name.lower().endswith(
+                                (".png", ".jpg", ".jpeg")
+                            ):
+                                wallpaper_count += 1
+                        except OSError:
+                            pass
 
                 packs.append(
                     {
