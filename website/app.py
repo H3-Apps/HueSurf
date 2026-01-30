@@ -71,7 +71,7 @@ def wallpapers():
     return render_template("wallpapers.html")
 
 
-@app.route("/api/wallpapers/repack")
+@app.route("/api/wallpapers/repack", methods=["POST"])
 def repack_wallpapers():
     """Trigger repacking of wallpapers to static folder"""
     if not app.config["DEBUG"]:
