@@ -48,9 +48,9 @@ python scripts/pack_wallpapers.py --force --verbose
 ```
 
 ### Via Web API
-You can also trigger repacking through the website:
+You can also trigger repacking through the website (requires `POST` method):
 ```bash
-curl http://localhost:5000/api/wallpapers/repack
+curl -X POST http://localhost:5000/api/wallpapers/repack
 ```
 
 ## 📁 Directory Structure
