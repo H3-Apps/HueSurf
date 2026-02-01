@@ -1,6 +1,7 @@
 import os
 import zipfile
 import json
+import re
 from pathlib import Path
 import tempfile
 import time
@@ -71,7 +72,7 @@ def wallpapers():
     return render_template("wallpapers.html")
 
 
-@app.route("/api/wallpapers/repack")
+@app.route("/api/wallpapers/repack", methods=["POST"])
 def repack_wallpapers():
     """Trigger repacking of wallpapers to static folder"""
     if not app.config["DEBUG"]:
@@ -116,12 +117,31 @@ def repack_wallpapers():
 
 @app.route("/api/contact", methods=["POST"])
 def contact():
-    """Handle contact form submissions"""
+    """Handle contact form submissions with validation"""
     try:
         data = request.get_json()
-        name = data.get("name")
-        email = data.get("email")
-        message = data.get("message")
+        if not data:
+            return jsonify({"success": False, "message": "No data provided"}), 400
+
+        name = data.get("name", "").strip()
+        email = data.get("email", "").strip()
+        message = data.get("message", "").strip()
+
+        # Validation
+        errors = []
+        if not name:
+            errors.append("Name is required")
+        if not email:
+            errors.append("Email is required")
+        elif not re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email):
+            errors.append("Invalid email format")
+        if not message:
+            errors.append("Message is required")
+
+        if errors:
+            return jsonify(
+                {"success": False, "message": "Validation failed", "errors": errors}
+            ), 400
 
         # Here you would typically send an email or save to database
         # For now, we'll just return a success response
@@ -129,7 +149,10 @@ def contact():
         return jsonify(
             {
                 "success": True,
-                "message": "Thanks for reaching out! We'll get back to you soon (unless Javier's robot took over).",
+                "message": (
+                    "Thanks for reaching out! We'll get back to you soon "
+                    "(unless Javier's robot took over)."
+                ),
             }
         )
     except Exception as e:
@@ -558,6 +581,29 @@ def not_found(error):
 def internal_error(error):
     """Handle 500 errors"""
     return render_template("500.html"), 500
+
+
+@app.after_request
+def add_security_headers(response):
+    """Add security headers to all responses"""
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
+    # Content Security Policy
+    csp = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' "
+        "https://cdn.tailwindcss.com https://cdn.jsdelivr.net; "
+        "style-src 'self' 'unsafe-inline' "
+        "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
+        "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
+        "img-src 'self' data:; "
+        "connect-src 'self';"
+    )
+    response.headers["Content-Security-Policy"] = csp
+    return response
 
 
 # Context processors to make data available to all templates
