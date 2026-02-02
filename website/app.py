@@ -1,6 +1,7 @@
 import os
 import zipfile
 import json
+import mimetypes
 from pathlib import Path
 import tempfile
 import time
@@ -90,6 +91,18 @@ def repack_wallpapers():
         )
 
         if result.returncode == 0:
+            # Clear all relevant caches after repacking
+            _load_manifest.cache_clear()
+            _get_images_in_pack.cache_clear()
+            _load_pack_info.cache_clear()
+            _scan_wallpapers.cache_clear()
+            get_all_wallpapers.cache_clear()
+
+            # Reset the manual packs cache
+            global _PACKS_CACHE, _PACKS_CACHE_TIME
+            _PACKS_CACHE = None
+            _PACKS_CACHE_TIME = 0
+
             return jsonify(
                 {
                     "success": True,
@@ -141,6 +154,42 @@ def contact():
         ), 500
 
 
+@lru_cache(maxsize=1)
+def _load_manifest():
+    """Load wallpaper manifest from static folder with caching"""
+    manifest_path = Path(__file__).parent / "static" / "wallpapers" / "manifest.json"
+    if manifest_path.exists():
+        try:
+            with open(manifest_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return None
+
+
+@lru_cache(maxsize=32)
+def _get_images_in_pack(pack_dir):
+    """Get list of image files in a pack directory with caching"""
+    images = []
+    if pack_dir.exists() and pack_dir.is_dir():
+        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
+            # Use list comprehension to avoid multiple list extensions
+            images.extend(pack_dir.glob(f"*{ext}"))
+    return tuple(sorted(images))
+
+
+@lru_cache(maxsize=32)
+def _load_pack_info(pack_info_path):
+    """Load pack info from JSON file with caching"""
+    if pack_info_path.exists():
+        try:
+            with open(pack_info_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+
 def _scan_wallpaper_packs(wallpapers_dir):
     """Scan wallpaper packs directory with caching"""
     global _PACKS_CACHE, _PACKS_CACHE_TIME
@@ -165,17 +214,17 @@ def _scan_wallpaper_packs(wallpapers_dir):
                     except Exception:
                         pass
 
-                # Count wallpapers in pack
-                wallpaper_count = len(
-                    list(pack_dir.glob("*.png"))
-                    + list(pack_dir.glob("*.jpg"))
-                    + list(pack_dir.glob("*.jpeg"))
-                )
+                # Get images using cached helper
+                images = _get_images_in_pack(pack_dir)
+                wallpaper_count = len(images)
 
-                # Calculate pack size
-                pack_size = sum(
-                    f.stat().st_size for f in pack_dir.rglob("*") if f.is_file()
-                )
+                # Calculate pack size (cached helper doesn't help here for size,
+                # but we can reuse the image list to at least avoid re-globbing)
+                pack_size = sum(f.stat().st_size for f in images)
+
+                # Also include pack_info.json in size if it exists
+                if pack_info_path.exists():
+                    pack_size += pack_info_path.stat().st_size
 
                 packs.append(
                     {
@@ -204,14 +253,9 @@ def get_wallpaper_packs():
     """Get list of available wallpaper packs from static manifest"""
     try:
         # Try to read from static manifest first
-        manifest_path = (
-            Path(__file__).parent / "static" / "wallpapers" / "manifest.json"
-        )
+        manifest = _load_manifest()
 
-        if manifest_path.exists():
-            with open(manifest_path, "r") as f:
-                manifest = json.load(f)
-
+        if manifest:
             packs = []
             for pack in manifest.get("packs", []):
                 pack_data = {
@@ -394,11 +438,13 @@ def get_wallpaper_preview(pack_name):
         if not pack_dir.exists() or not pack_dir.is_dir():
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
-        # Find first image file
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images = list(pack_dir.glob(f"*{ext}"))
-            if images:
-                return send_file(images[0], mimetype=f"image/{ext[1:]}")
+        # Find first image file using cached helper
+        images = _get_images_in_pack(pack_dir)
+        if images:
+            first_image = images[0]
+            # Use mimetypes guess for accuracy (e.g., .jpg -> image/jpeg)
+            mime_type, _ = mimetypes.guess_type(str(first_image))
+            return send_file(first_image, mimetype=mime_type or "image/jpeg")
 
         abort(404, description="No preview available")
     except Exception as e:
@@ -508,10 +554,8 @@ def get_random_wallpaper(pack_name):
         if not pack_dir.exists() or not pack_dir.is_dir():
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
-        # Find all image files
-        images = []
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images.extend(list(pack_dir.glob(f"*{ext}")))
+        # Find all image files using cached helper
+        images = _get_images_in_pack(pack_dir)
 
         if not images:
             abort(404, description="No wallpapers found in pack")
@@ -519,16 +563,15 @@ def get_random_wallpaper(pack_name):
         # Select random wallpaper
         random_image = random.choice(images)
 
-        # Read pack info for metadata
+        # Read pack info for metadata using cached helper
         pack_info_path = pack_dir / "pack_info.json"
+        pack_info = _load_pack_info(pack_info_path)
+
         wallpaper_meta = {}
-        if pack_info_path.exists():
-            with open(pack_info_path, "r") as f:
-                pack_info = json.load(f)
-                for wp in pack_info.get("wallpapers", []):
-                    if wp["filename"] == random_image.name:
-                        wallpaper_meta = wp
-                        break
+        for wp in pack_info.get("wallpapers", []):
+            if wp["filename"] == random_image.name:
+                wallpaper_meta = wp
+                break
 
         return jsonify(
             {
