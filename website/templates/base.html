@@ -3,7 +3,8 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <title>HueSurf</title>
+        <title>{% block title %}HueSurf{% endblock %}</title>
+        <meta name="description" content="{% block description %}A lightweight Chromium-based browser without ads, AI, sponsors, or bloat.{% endblock %}" />
 
         <!-- JetBrains Mono from Google Fonts (weights used: 300 light, 800 extra-bold) -->
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -65,6 +66,11 @@
                 display: inline-block;
             }
 
+            .title a {
+                text-decoration: none;
+                color: inherit;
+            }
+
             /* Buttons row */
             .controls {
                 display: flex;
@@ -119,58 +125,12 @@
                 }
             }
         </style>
+        {% block extra_css %}{% endblock %}
     </head>
     <body>
         <main class="wrap" role="main">
-            <h1 class="title" aria-label="HueSurf">
-                <span class="hue">Hue</span><span class="surf">Surf</span>
-            </h1>
-
-            <nav
-                class="controls"
-                role="navigation"
-                aria-label="Primary actions"
-            >
-                <!-- Download: a small placeholder README file (data URI, base64) -->
-                <a
-                    class="button"
-                    href="data:application/octet-stream;base64,SHVlU3VyZgpNaW5pbWFsaXN0IGJyb3dzZXIgcGxhY2Vob2xkZXIuClZlcnNpb24gMC4xCmh0dHBzOi8vZ2l0aHViLmNvbS9IMy1BcHBzL0h1ZVN1cmYK"
-                    download="HueSurf-README.txt"
-                    role="button"
-                    aria-label="Download HueSurf placeholder"
-                >
-                    Download
-                </a>
-
-
-                <a
-                    class="button"
-                    href="https://discord.gg/QMuSphMAw2"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    role="button"
-                    aria-label="Open HueSurf Discord"
-                >
-                    Discord
-                </a>
-
-                <!-- GitHub button -->
-                <a
-                    class="button"
-                    href="https://github.com/H3-Apps/HueSurf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    role="button"
-                    aria-label="Open HueSurf GitHub repository"
-                >
-                    GitHub
-                </a>
-            </nav>
-
-            <p class="meta">
-                A lightweight chromium based browser without ad's, ai, sponsors,
-                or bloat.
-            </p>
+            {% block content %}{% endblock %}
         </main>
+        {% block extra_js %}{% endblock %}
     </body>
 </html>

@@ -122,6 +122,14 @@
                 cursor: pointer;
                 transition: all 0.3s ease;
                 border: 2px solid #4b5563;
+                padding: 0;
+                display: block;
+            }
+
+            .toggle-switch:focus-visible {
+                outline: 2px solid #dc2626;
+                outline-offset: 4px;
+                box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.2);
             }
 
             .toggle-switch.active {
@@ -229,9 +237,9 @@
         <nav class="glass-effect border-0 shadow-lg mb-8">
             <div class="container mx-auto px-4 py-4">
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
+                    <a href="/" class="flex items-center space-x-3 no-underline group">
                         <div
-                            class="w-10 h-10 bg-gradient-red rounded-xl flex items-center justify-center shadow-lg"
+                            class="w-10 h-10 bg-gradient-red rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110"
                         >
                             <i class="fas fa-palette text-white text-lg"></i>
                         </div>
@@ -245,7 +253,7 @@
                                 Professional wallpaper management
                             </p>
                         </div>
-                    </div>
+                    </a>
                     <div class="flex items-center space-x-4">
                         <span class="text-gray-400 text-sm">v1.0.0</span>
                         <div
@@ -301,12 +309,16 @@
                                         >Shuffle on New Tab</span
                                     >
                                 </div>
-                                <div
-                                    class="toggle-switch"
+                                <button
+                                    type="button"
+                                    role="switch"
+                                    aria-checked="true"
+                                    aria-label="Toggle Shuffle on New Tab"
+                                    class="toggle-switch active"
                                     id="global-shuffle-toggle"
                                 >
-                                    <div class="toggle-slider"></div>
-                                </div>
+                                    <span class="toggle-slider"></span>
+                                </button>
                             </div>
                             <p class="text-gray-400 text-sm">
                                 Automatically change wallpapers when opening new
@@ -330,9 +342,16 @@
                                         >Remember Wallpaper</span
                                     >
                                 </div>
-                                <div class="toggle-switch" id="remember-toggle">
-                                    <div class="toggle-slider"></div>
-                                </div>
+                                <button
+                                    type="button"
+                                    role="switch"
+                                    aria-checked="false"
+                                    aria-label="Toggle Remember Wallpaper"
+                                    class="toggle-switch"
+                                    id="remember-toggle"
+                                >
+                                    <span class="toggle-slider"></span>
+                                </button>
                             </div>
                             <p class="text-gray-400 text-sm">
                                 Keep your last selected wallpaper across
@@ -517,6 +536,7 @@
                             document.getElementById("global-shuffle");
                         checkbox.checked = !checkbox.checked;
                         this.classList.toggle("active", checkbox.checked);
+                        this.setAttribute("aria-checked", checkbox.checked);
                         localStorage.setItem("globalShuffle", checkbox.checked);
                         showNotification(
                             `Shuffle ${checkbox.checked ? "enabled" : "disabled"}`,
@@ -531,6 +551,7 @@
                             document.getElementById("remember-wallpaper");
                         checkbox.checked = !checkbox.checked;
                         this.classList.toggle("active", checkbox.checked);
+                        this.setAttribute("aria-checked", checkbox.checked);
                         localStorage.setItem(
                             "rememberWallpaper",
                             checkbox.checked,
@@ -554,12 +575,13 @@
                 document.getElementById("remember-wallpaper").checked =
                     rememberWallpaper;
 
-                document
-                    .getElementById("global-shuffle-toggle")
-                    .classList.toggle("active", globalShuffle);
-                document
-                    .getElementById("remember-toggle")
-                    .classList.toggle("active", rememberWallpaper);
+                const shuffleToggle = document.getElementById("global-shuffle-toggle");
+                shuffleToggle.classList.toggle("active", globalShuffle);
+                shuffleToggle.setAttribute("aria-checked", globalShuffle);
+
+                const rememberToggle = document.getElementById("remember-toggle");
+                rememberToggle.classList.toggle("active", rememberWallpaper);
+                rememberToggle.setAttribute("aria-checked", rememberWallpaper);
             }
 
             // Load wallpaper packs
@@ -694,7 +716,7 @@
                         ${
                             pack.shuffle_enabled
                                 ? `
-                        <button class="btn btn-outline-danger" onclick="testShuffle('${pack.id}')" title="Test shuffle">
+                        <button class="btn btn-outline-danger" onclick="testShuffle('${pack.id}')" title="Test shuffle" aria-label="Test shuffle for ${pack.name}">
                             <i class="fas fa-dice"></i>
                         </button>
                         `
@@ -995,6 +1017,7 @@
                 searchToggle.className = "btn btn-outline-light btn-sm";
                 searchToggle.innerHTML = '<i class="fas fa-search"></i>';
                 searchToggle.title = "Toggle Search";
+                searchToggle.setAttribute("aria-label", "Toggle Search");
 
                 searchToggle.addEventListener("click", function () {
                     const isVisible = searchInput.style.display !== "none";
