@@ -130,6 +130,11 @@
                 box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
             }
 
+            .toggle-switch:focus-visible {
+                outline: 2px solid #dc2626;
+                outline-offset: 4px;
+            }
+
             .toggle-slider {
                 position: absolute;
                 top: 2px;
@@ -251,6 +256,8 @@
                         <div
                             class="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-lg"
                             title="System Online"
+                            role="img"
+                            aria-label="System Online"
                         ></div>
                     </div>
                 </div>
@@ -301,12 +308,16 @@
                                         >Shuffle on New Tab</span
                                     >
                                 </div>
-                                <div
+                                <button
+                                    type="button"
+                                    role="switch"
+                                    aria-checked="true"
+                                    aria-label="Toggle Shuffle on New Tab"
                                     class="toggle-switch"
                                     id="global-shuffle-toggle"
                                 >
-                                    <div class="toggle-slider"></div>
-                                </div>
+                                    <span class="toggle-slider"></span>
+                                </button>
                             </div>
                             <p class="text-gray-400 text-sm">
                                 Automatically change wallpapers when opening new
@@ -330,9 +341,16 @@
                                         >Remember Wallpaper</span
                                     >
                                 </div>
-                                <div class="toggle-switch" id="remember-toggle">
-                                    <div class="toggle-slider"></div>
-                                </div>
+                                <button
+                                    type="button"
+                                    role="switch"
+                                    aria-checked="false"
+                                    aria-label="Toggle Remember Wallpaper"
+                                    class="toggle-switch"
+                                    id="remember-toggle"
+                                >
+                                    <span class="toggle-slider"></span>
+                                </button>
                             </div>
                             <p class="text-gray-400 text-sm">
                                 Keep your last selected wallpaper across
@@ -517,6 +535,7 @@
                             document.getElementById("global-shuffle");
                         checkbox.checked = !checkbox.checked;
                         this.classList.toggle("active", checkbox.checked);
+                        this.setAttribute("aria-checked", checkbox.checked.toString());
                         localStorage.setItem("globalShuffle", checkbox.checked);
                         showNotification(
                             `Shuffle ${checkbox.checked ? "enabled" : "disabled"}`,
@@ -531,6 +550,7 @@
                             document.getElementById("remember-wallpaper");
                         checkbox.checked = !checkbox.checked;
                         this.classList.toggle("active", checkbox.checked);
+                        this.setAttribute("aria-checked", checkbox.checked.toString());
                         localStorage.setItem(
                             "rememberWallpaper",
                             checkbox.checked,
@@ -554,12 +574,14 @@
                 document.getElementById("remember-wallpaper").checked =
                     rememberWallpaper;
 
-                document
-                    .getElementById("global-shuffle-toggle")
-                    .classList.toggle("active", globalShuffle);
-                document
-                    .getElementById("remember-toggle")
-                    .classList.toggle("active", rememberWallpaper);
+                const shuffleToggle = document.getElementById("global-shuffle-toggle");
+                const rememberToggle = document.getElementById("remember-toggle");
+
+                shuffleToggle.classList.toggle("active", globalShuffle);
+                shuffleToggle.setAttribute("aria-checked", globalShuffle.toString());
+
+                rememberToggle.classList.toggle("active", rememberWallpaper);
+                rememberToggle.setAttribute("aria-checked", rememberWallpaper.toString());
             }
 
             // Load wallpaper packs
@@ -694,7 +716,7 @@
                         ${
                             pack.shuffle_enabled
                                 ? `
-                        <button class="btn btn-outline-danger" onclick="testShuffle('${pack.id}')" title="Test shuffle">
+                        <button class="btn btn-outline-danger" onclick="testShuffle('${pack.id}')" title="Test shuffle" aria-label="Test shuffle for ${pack.name}">
                             <i class="fas fa-dice"></i>
                         </button>
                         `
@@ -995,6 +1017,7 @@
                 searchToggle.className = "btn btn-outline-light btn-sm";
                 searchToggle.innerHTML = '<i class="fas fa-search"></i>';
                 searchToggle.title = "Toggle Search";
+                searchToggle.setAttribute("aria-label", "Toggle search bar");
 
                 searchToggle.addEventListener("click", function () {
                     const isVisible = searchInput.style.display !== "none";
