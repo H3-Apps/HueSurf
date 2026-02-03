@@ -71,7 +71,7 @@ def wallpapers():
     return render_template("wallpapers.html")
 
 
-@app.route("/api/wallpapers/repack")
+@app.route("/api/wallpapers/repack", methods=["GET", "POST"])
 def repack_wallpapers():
     """Trigger repacking of wallpapers to static folder"""
     if not app.config["DEBUG"]:
@@ -90,6 +90,15 @@ def repack_wallpapers():
         )
 
         if result.returncode == 0:
+            # ⚡ Bolt: Clear all caches after successful repack
+            _get_images_in_pack.cache_clear()
+            _load_manifest.cache_clear()
+            _scan_wallpapers.cache_clear()
+            get_all_wallpapers.cache_clear()
+
+            global _PACKS_CACHE
+            _PACKS_CACHE = None
+
             return jsonify(
                 {
                     "success": True,
@@ -141,6 +150,41 @@ def contact():
         ), 500
 
 
+@lru_cache(maxsize=64)
+def _get_images_in_pack(pack_dir):
+    """Helper to get all images in a pack with a single-pass recursive scan"""
+    images_with_size = []
+    total_size = 0
+    pack_dir_path = Path(pack_dir)
+
+    if pack_dir_path.exists():
+        # ⚡ Bolt: Use rglob("*") for recursive single-pass scan
+        # This replaces multiple glob() and stat() calls across the app
+        for file_path in pack_dir_path.rglob("*"):
+            if file_path.is_file():
+                try:
+                    size = file_path.stat().st_size
+                    total_size += size
+                    if file_path.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}:
+                        images_with_size.append((file_path, size))
+                except OSError:
+                    continue
+
+    # Sort by filename for consistency
+    images_with_size.sort(key=lambda x: x[0].name)
+    return tuple(images_with_size), total_size
+
+
+@lru_cache(maxsize=1)
+def _load_manifest(manifest_path):
+    """Helper to load and cache the wallpaper manifest"""
+    try:
+        with open(manifest_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return None
+
+
 def _scan_wallpaper_packs(wallpapers_dir):
     """Scan wallpaper packs directory with caching"""
     global _PACKS_CACHE, _PACKS_CACHE_TIME
@@ -158,30 +202,20 @@ def _scan_wallpaper_packs(wallpapers_dir):
                 # Read pack metadata if available
                 pack_info = {}
                 pack_info_path = pack_dir / "pack_info.json"
-                if pack_info_path.exists():
-                    try:
-                        with open(pack_info_path, "r", encoding="utf-8") as f:
-                            pack_info = json.load(f)
-                    except Exception:
-                        pass
+                try:
+                    with open(pack_info_path, "r", encoding="utf-8") as f:
+                        pack_info = json.load(f)
+                except (FileNotFoundError, json.JSONDecodeError, OSError):
+                    pass
 
-                # Count wallpapers in pack
-                wallpaper_count = len(
-                    list(pack_dir.glob("*.png"))
-                    + list(pack_dir.glob("*.jpg"))
-                    + list(pack_dir.glob("*.jpeg"))
-                )
-
-                # Calculate pack size
-                pack_size = sum(
-                    f.stat().st_size for f in pack_dir.rglob("*") if f.is_file()
-                )
+                # ⚡ Bolt: Use optimized single-pass helper
+                images, pack_size = _get_images_in_pack(pack_dir)
 
                 packs.append(
                     {
                         "id": pack_dir.name.lower().replace(" ", "_"),
                         "name": pack_dir.name,
-                        "count": wallpaper_count,
+                        "count": len(images),
                         "size_mb": round(pack_size / (1024 * 1024), 2),
                         "preview": f"/api/wallpapers/preview/{pack_dir.name}",
                         "description": pack_info.get(
@@ -208,9 +242,8 @@ def get_wallpaper_packs():
             Path(__file__).parent / "static" / "wallpapers" / "manifest.json"
         )
 
-        if manifest_path.exists():
-            with open(manifest_path, "r") as f:
-                manifest = json.load(f)
+        manifest = _load_manifest(manifest_path)
+        if manifest:
 
             packs = []
             for pack in manifest.get("packs", []):
@@ -305,24 +338,21 @@ def download_wallpaper_pack(pack_name):
                 dir=static_zip_path.parent, suffix=".tmp", delete=False
             ) as tmp_file:
                 temp_zip_path = Path(tmp_file.name)
+                # ⚡ Bolt: Use optimized single-pass helper
+                images, _ = _get_images_in_pack(pack_dir)
+
                 with zipfile.ZipFile(tmp_file, "w", zipfile.ZIP_DEFLATED) as zipf:
                     # Add all image files from the pack
-                    for file_path in pack_dir.rglob("*"):
-                        if file_path.is_file() and file_path.suffix.lower() in [
-                            ".png",
-                            ".jpg",
-                            ".jpeg",
-                            ".webp",
-                        ]:
-                            arcname = f"{pack_name}/{file_path.relative_to(pack_dir)}"
-                            zipf.write(file_path, arcname)
+                    for file_path, _ in images:
+                        arcname = f"{pack_name}/{file_path.relative_to(pack_dir)}"
+                        zipf.write(file_path, arcname)
 
                     # Add metadata
                     pack_info_path = pack_dir / "pack_info.json"
-                    if pack_info_path.exists():
+                    try:
                         with open(pack_info_path, "r") as f:
                             metadata = json.load(f)
-                    else:
+                    except (FileNotFoundError, json.JSONDecodeError, OSError):
                         metadata = {
                             "pack_name": pack_name,
                             "version": "1.0.0",
@@ -330,11 +360,7 @@ def download_wallpaper_pack(pack_name):
                             "description": f"{pack_name} wallpaper pack for HueSurf browser",
                             "shuffle_enabled": True,
                             "shuffle_on_new_tab": True,
-                            "count": len(
-                                list(pack_dir.glob("*.png"))
-                                + list(pack_dir.glob("*.jpg"))
-                                + list(pack_dir.glob("*.jpeg"))
-                            ),
+                            "count": len(images),
                             "settings": {
                                 "shuffle_interval": "new_tab",
                                 "transition_effect": "fade",
@@ -394,11 +420,12 @@ def get_wallpaper_preview(pack_name):
         if not pack_dir.exists() or not pack_dir.is_dir():
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
-        # Find first image file
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images = list(pack_dir.glob(f"*{ext}"))
-            if images:
-                return send_file(images[0], mimetype=f"image/{ext[1:]}")
+        # ⚡ Bolt: Use optimized single-pass helper
+        images, _ = _get_images_in_pack(pack_dir)
+        if images:
+            image_path = images[0][0]
+            ext = image_path.suffix.lower()[1:]
+            return send_file(image_path, mimetype=f"image/{ext}")
 
         abort(404, description="No preview available")
     except Exception as e:
@@ -420,34 +447,30 @@ def _scan_wallpapers():
                 pack_info = {}
                 wallpaper_metadata = {}
                 pack_info_path = pack_dir / "pack_info.json"
-                if pack_info_path.exists():
+                try:
                     with open(pack_info_path, "r", encoding="utf-8") as f:
                         pack_info = json.load(f)
                         # Create lookup dictionary for wallpaper metadata
                         for wp in pack_info.get("wallpapers", []):
                             wallpaper_metadata[wp["filename"]] = wp
+                except (FileNotFoundError, json.JSONDecodeError, OSError):
+                    pass
 
-                for file_path in pack_dir.rglob("*"):
-                    if file_path.is_file() and file_path.suffix.lower() in [
-                        ".png",
-                        ".jpg",
-                        ".jpeg",
-                        ".webp",
-                    ]:
-                        wp_meta = wallpaper_metadata.get(file_path.name, {})
-                        wallpapers_list.append(
-                            {
-                                "name": wp_meta.get("name", file_path.stem),
-                                "pack": pack_dir.name,
-                                "filename": file_path.name,
-                                "path": f"/api/wallpapers/single/{pack_dir.name}/{file_path.name}",
-                                "size_kb": round(
-                                    file_path.stat().st_size / 1024, 2
-                                ),
-                                "description": wp_meta.get("description", ""),
-                                "tags": wp_meta.get("tags", []),
-                            }
-                        )
+                # ⚡ Bolt: Use optimized single-pass helper
+                images, _ = _get_images_in_pack(pack_dir)
+                for file_path, size in images:
+                    wp_meta = wallpaper_metadata.get(file_path.name, {})
+                    wallpapers_list.append(
+                        {
+                            "name": wp_meta.get("name", file_path.stem),
+                            "pack": pack_dir.name,
+                            "filename": file_path.name,
+                            "path": f"/api/wallpapers/single/{pack_dir.name}/{file_path.name}",
+                            "size_kb": round(size / 1024, 2),
+                            "description": wp_meta.get("description", ""),
+                            "tags": wp_meta.get("tags", []),
+                        }
+                    )
     return wallpapers_list
 
 
@@ -508,35 +531,35 @@ def get_random_wallpaper(pack_name):
         if not pack_dir.exists() or not pack_dir.is_dir():
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
-        # Find all image files
-        images = []
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images.extend(list(pack_dir.glob(f"*{ext}")))
+        # ⚡ Bolt: Use optimized single-pass helper
+        images, _ = _get_images_in_pack(pack_dir)
 
         if not images:
             abort(404, description="No wallpapers found in pack")
 
         # Select random wallpaper
-        random_image = random.choice(images)
+        random_image_path, _ = random.choice(images)
 
         # Read pack info for metadata
         pack_info_path = pack_dir / "pack_info.json"
         wallpaper_meta = {}
-        if pack_info_path.exists():
+        try:
             with open(pack_info_path, "r") as f:
                 pack_info = json.load(f)
                 for wp in pack_info.get("wallpapers", []):
-                    if wp["filename"] == random_image.name:
+                    if wp["filename"] == random_image_path.name:
                         wallpaper_meta = wp
                         break
+        except (FileNotFoundError, json.JSONDecodeError, OSError):
+            pass
 
         return jsonify(
             {
                 "success": True,
                 "wallpaper": {
-                    "filename": random_image.name,
-                    "name": wallpaper_meta.get("name", random_image.stem),
-                    "path": f"/api/wallpapers/single/{pack_name}/{random_image.name}",
+                    "filename": random_image_path.name,
+                    "name": wallpaper_meta.get("name", random_image_path.stem),
+                    "path": f"/api/wallpapers/single/{pack_name}/{random_image_path.name}",
                     "description": wallpaper_meta.get("description", ""),
                     "tags": wallpaper_meta.get("tags", []),
                 },
