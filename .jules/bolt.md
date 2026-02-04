@@ -1,0 +1,3 @@
+## 2025-02-11 - Single-pass filesystem traversal
+**Learning:** In Flask applications performing directory scans for metadata (like file counts and total sizes), using multiple `glob()` calls and a separate `rglob()` traversal for size calculation causes redundant I/O operations. Combining these into a single `rglob("*")` pass with manual filtering and stat gathering significantly reduces response times, especially on slower filesystems.
+**Action:** Always prefer single-pass directory iteration (using `os.scandir` or `Path.rglob`) when multiple file properties or filtered lists are needed from the same tree.
