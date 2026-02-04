@@ -23,6 +23,24 @@ if not app.config["SECRET_KEY"]:
 app.config["DEBUG"] = os.environ.get("FLASK_ENV") == "development"
 
 
+@app.after_request
+def add_security_headers(response):
+    """Add security headers to all responses"""
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
+        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
+        "img-src 'self' data:; "
+        "connect-src 'self';"
+    )
+    return response
+
+
 @app.route("/")
 def index():
     """Landing page for HueSurf browser"""
@@ -71,7 +89,7 @@ def wallpapers():
     return render_template("wallpapers.html")
 
 
-@app.route("/api/wallpapers/repack")
+@app.route("/api/wallpapers/repack", methods=["POST"])
 def repack_wallpapers():
     """Trigger repacking of wallpapers to static folder"""
     if not app.config["DEBUG"]:
@@ -98,19 +116,21 @@ def repack_wallpapers():
                 }
             )
         else:
+            app.logger.error(f"Repack failed: {result.stderr}")
             return jsonify(
                 {
                     "success": False,
                     "message": "Failed to repack wallpapers",
-                    "error": result.stderr,
                 }
             ), 500
 
     except subprocess.TimeoutExpired:
+        app.logger.error("Repacking timed out")
         return jsonify({"success": False, "message": "Repacking timed out"}), 500
     except Exception as e:
+        app.logger.error(f"Error repacking wallpapers: {str(e)}")
         return jsonify(
-            {"success": False, "message": f"Error repacking wallpapers: {str(e)}"}
+            {"success": False, "message": "An internal error occurred during repacking"}
         ), 500
 
 
@@ -119,9 +139,26 @@ def contact():
     """Handle contact form submissions"""
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({"success": False, "message": "No data provided"}), 400
+
         name = data.get("name")
         email = data.get("email")
         message = data.get("message")
+
+        # Basic input validation
+        if not name or len(name) < 2 or len(name) > 100:
+            return jsonify({"success": False, "message": "Invalid name"}), 400
+        if not email or "@" not in email or "." not in email or len(email) > 255:
+            return (
+                jsonify({"success": False, "message": "Invalid email address"}),
+                400,
+            )
+        if not message or len(message) < 10 or len(message) > 5000:
+            return (
+                jsonify({"success": False, "message": "Message length invalid"}),
+                400,
+            )
 
         # Here you would typically send an email or save to database
         # For now, we'll just return a success response
@@ -258,8 +295,9 @@ def get_wallpaper_packs():
 
         return jsonify({"success": True, "packs": packs, "total_packs": len(packs)})
     except Exception as e:
+        app.logger.error(f"Error fetching wallpaper packs: {str(e)}")
         return jsonify(
-            {"success": False, "message": f"Error fetching wallpaper packs: {str(e)}"}
+            {"success": False, "message": "An error occurred while fetching wallpaper packs"}
         ), 500
 
 
@@ -363,8 +401,9 @@ def download_wallpaper_pack(pack_name):
             mimetype="application/zip",
         )
     except Exception as e:
+        app.logger.error(f"Error creating wallpaper pack: {str(e)}")
         return jsonify(
-            {"success": False, "message": f"Error creating wallpaper pack: {str(e)}"}
+            {"success": False, "message": "An error occurred while creating the wallpaper pack"}
         ), 500
 
 
@@ -402,8 +441,9 @@ def get_wallpaper_preview(pack_name):
 
         abort(404, description="No preview available")
     except Exception as e:
+        app.logger.error(f"Error fetching preview: {str(e)}")
         return jsonify(
-            {"success": False, "message": f"Error fetching preview: {str(e)}"}
+            {"success": False, "message": "An error occurred while fetching the preview"}
         ), 500
 
 
@@ -464,8 +504,9 @@ def get_all_wallpapers():
             {"success": True, "wallpapers": wallpapers_list, "total": len(wallpapers_list)}
         )
     except Exception as e:
+        app.logger.error(f"Error fetching wallpapers: {str(e)}")
         return jsonify(
-            {"success": False, "message": f"Error fetching wallpapers: {str(e)}"}
+            {"success": False, "message": "An error occurred while fetching wallpapers"}
         ), 500
 
 
@@ -488,8 +529,9 @@ def get_single_wallpaper(pack_name, filename):
 
         return send_file(file_path, as_attachment=True)
     except Exception as e:
+        app.logger.error(f"Error downloading wallpaper: {str(e)}")
         return jsonify(
-            {"success": False, "message": f"Error downloading wallpaper: {str(e)}"}
+            {"success": False, "message": "An error occurred while downloading the wallpaper"}
         ), 500
 
 
@@ -543,8 +585,9 @@ def get_random_wallpaper(pack_name):
             }
         )
     except Exception as e:
+        app.logger.error(f"Error getting random wallpaper: {str(e)}")
         return jsonify(
-            {"success": False, "message": f"Error getting random wallpaper: {str(e)}"}
+            {"success": False, "message": "An error occurred while getting a random wallpaper"}
         ), 500
 
 
