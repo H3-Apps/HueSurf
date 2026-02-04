@@ -221,6 +221,11 @@
                     rgba(220, 38, 38, 0.2) 100%
                 );
             }
+
+            button:focus-visible, a:focus-visible, [role="switch"]:focus-visible {
+                outline: 2px solid #dc2626 !important;
+                outline-offset: 4px;
+            }
         </style>
     </head>
 
@@ -301,23 +306,11 @@
                                         >Shuffle on New Tab</span
                                     >
                                 </div>
-                                <div
-                                    class="toggle-switch"
-                                    id="global-shuffle-toggle"
-                                >
+                                <button type="button" role="switch" aria-checked="true" aria-label="Toggle shuffle" class="toggle-switch focus:outline-none" id="global-shuffle-toggle">
                                     <div class="toggle-slider"></div>
-                                </div>
+                                </button>
                             </div>
-                            <p class="text-gray-400 text-sm">
-                                Automatically change wallpapers when opening new
-                                tabs
-                            </p>
-                            <input
-                                type="checkbox"
-                                id="global-shuffle"
-                                class="hidden"
-                                checked
-                            />
+                            <p class="text-gray-400 text-sm">Automatically change wallpapers on new tabs</p>
                         </div>
 
                         <div
@@ -330,19 +323,11 @@
                                         >Remember Wallpaper</span
                                     >
                                 </div>
-                                <div class="toggle-switch" id="remember-toggle">
+                                <button type="button" role="switch" aria-checked="false" aria-label="Toggle remember wallpaper" class="toggle-switch focus:outline-none" id="remember-toggle">
                                     <div class="toggle-slider"></div>
-                                </div>
+                                </button>
                             </div>
-                            <p class="text-gray-400 text-sm">
-                                Keep your last selected wallpaper across
-                                sessions
-                            </p>
-                            <input
-                                type="checkbox"
-                                id="remember-wallpaper"
-                                class="hidden"
-                            />
+                            <p class="text-gray-400 text-sm">Keep your last selected wallpaper across sessions</p>
                         </div>
 
                         <div
@@ -508,58 +493,29 @@
                 loadWallpaperPacks();
             });
 
-            // Initialize toggle switches
             function initializeToggles() {
-                document
-                    .getElementById("global-shuffle-toggle")
-                    .addEventListener("click", function () {
-                        const checkbox =
-                            document.getElementById("global-shuffle");
-                        checkbox.checked = !checkbox.checked;
-                        this.classList.toggle("active", checkbox.checked);
-                        localStorage.setItem("globalShuffle", checkbox.checked);
-                        showNotification(
-                            `Shuffle ${checkbox.checked ? "enabled" : "disabled"}`,
-                            checkbox.checked ? "success" : "info",
-                        );
+                ['global-shuffle-toggle', 'remember-toggle'].forEach(id => {
+                    const btn = document.getElementById(id);
+                    btn.addEventListener("click", function() {
+                        const active = this.getAttribute("aria-checked") !== "true";
+                        this.setAttribute("aria-checked", active);
+                        this.classList.toggle("active", active);
+                        localStorage.setItem(id === 'remember-toggle' ? "rememberWallpaper" : "globalShuffle", active);
+                        showNotification(`${id.includes('shuffle') ? 'Shuffle' : 'Remember'} ${active ? 'enabled' : 'disabled'}`, 'info');
                     });
-
-                document
-                    .getElementById("remember-toggle")
-                    .addEventListener("click", function () {
-                        const checkbox =
-                            document.getElementById("remember-wallpaper");
-                        checkbox.checked = !checkbox.checked;
-                        this.classList.toggle("active", checkbox.checked);
-                        localStorage.setItem(
-                            "rememberWallpaper",
-                            checkbox.checked,
-                        );
-                        showNotification(
-                            `Remember wallpaper ${checkbox.checked ? "enabled" : "disabled"}`,
-                            "info",
-                        );
-                    });
+                });
             }
 
-            // Load settings from localStorage
             function loadSettings() {
-                const globalShuffle =
-                    localStorage.getItem("globalShuffle") !== "false";
-                const rememberWallpaper =
-                    localStorage.getItem("rememberWallpaper") === "true";
-
-                document.getElementById("global-shuffle").checked =
-                    globalShuffle;
-                document.getElementById("remember-wallpaper").checked =
-                    rememberWallpaper;
-
-                document
-                    .getElementById("global-shuffle-toggle")
-                    .classList.toggle("active", globalShuffle);
-                document
-                    .getElementById("remember-toggle")
-                    .classList.toggle("active", rememberWallpaper);
+                const shuffle = localStorage.getItem("globalShuffle") !== "false";
+                const remember = localStorage.getItem("rememberWallpaper") === "true";
+                const set = (id, val) => {
+                    const el = document.getElementById(id);
+                    el.setAttribute("aria-checked", val);
+                    el.classList.toggle("active", val);
+                };
+                set("global-shuffle-toggle", shuffle);
+                set("remember-toggle", remember);
             }
 
             // Load wallpaper packs
