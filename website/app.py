@@ -71,7 +71,7 @@ def wallpapers():
     return render_template("wallpapers.html")
 
 
-@app.route("/api/wallpapers/repack")
+@app.route("/api/wallpapers/repack", methods=["POST"])
 def repack_wallpapers():
     """Trigger repacking of wallpapers to static folder"""
     if not app.config["DEBUG"]:
@@ -94,34 +94,52 @@ def repack_wallpapers():
                 {
                     "success": True,
                     "message": "Wallpapers repacked successfully",
-                    "output": result.stdout,
                 }
             )
-        else:
-            return jsonify(
-                {
-                    "success": False,
-                    "message": "Failed to repack wallpapers",
-                    "error": result.stderr,
-                }
-            ), 500
+
+        app.logger.error("Repack failed: %s", result.stderr)
+        return jsonify(
+            {
+                "success": False,
+                "message": "Failed to repack wallpapers",
+            }
+        ), 500
 
     except subprocess.TimeoutExpired:
+        app.logger.error("Repack timed out")
         return jsonify({"success": False, "message": "Repacking timed out"}), 500
-    except Exception as e:
+    except Exception:
+        app.logger.error("Error repacking wallpapers", exc_info=True)
         return jsonify(
-            {"success": False, "message": f"Error repacking wallpapers: {str(e)}"}
+            {"success": False, "message": "An error occurred during repacking"}
         ), 500
 
 
 @app.route("/api/contact", methods=["POST"])
 def contact():
-    """Handle contact form submissions"""
+    """Handle contact form submissions with validation"""
     try:
         data = request.get_json()
-        name = data.get("name")
-        email = data.get("email")
-        message = data.get("message")
+        if not data:
+            return jsonify({"success": False, "message": "No data provided"}), 400
+
+        name = data.get("name", "").strip()
+        email = data.get("email", "").strip()
+        message = data.get("message", "").strip()
+
+        # Validation
+        errors = []
+        if not name or len(name) < 2 or len(name) > 100:
+            errors.append("Name must be between 2 and 100 characters.")
+
+        if not email or "@" not in email or "." not in email or len(email) > 255:
+            errors.append("Please provide a valid email address.")
+
+        if not message or len(message) < 10 or len(message) > 5000:
+            errors.append("Message must be between 10 and 5000 characters.")
+
+        if errors:
+            return jsonify({"success": False, "message": " ".join(errors)}), 400
 
         # Here you would typically send an email or save to database
         # For now, we'll just return a success response
@@ -129,14 +147,15 @@ def contact():
         return jsonify(
             {
                 "success": True,
-                "message": "Thanks for reaching out! We'll get back to you soon (unless Javier's robot took over).",
+                "message": "Thanks for reaching out! We'll get back to you soon.",
             }
         )
-    except Exception as e:
+    except Exception:
+        app.logger.error("Error in contact form", exc_info=True)
         return jsonify(
             {
                 "success": False,
-                "message": "Oops! Something went wrong. Please try again or hit us up on GitHub.",
+                "message": "Oops! Something went wrong. Please try again later.",
             }
         ), 500
 
@@ -558,6 +577,25 @@ def not_found(error):
 def internal_error(error):
     """Handle 500 errors"""
     return render_template("500.html"), 500
+
+
+@app.after_request
+def add_security_headers(response):
+    """Add security headers to all responses"""
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdn.jsdelivr.net; "
+        "style-src 'self' 'unsafe-inline' fonts.googleapis.com "
+        "cdn.jsdelivr.net cdnjs.cloudflare.com; "
+        "font-src 'self' fonts.gstatic.com cdnjs.cloudflare.com; "
+        "img-src 'self' data:; "
+        "connect-src 'self';"
+    )
+    return response
 
 
 # Context processors to make data available to all templates
