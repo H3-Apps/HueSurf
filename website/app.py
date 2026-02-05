@@ -1,6 +1,7 @@
 import os
 import zipfile
 import json
+import re
 from pathlib import Path
 import tempfile
 import time
@@ -71,7 +72,7 @@ def wallpapers():
     return render_template("wallpapers.html")
 
 
-@app.route("/api/wallpapers/repack")
+@app.route("/api/wallpapers/repack", methods=["POST"])
 def repack_wallpapers():
     """Trigger repacking of wallpapers to static folder"""
     if not app.config["DEBUG"]:
@@ -94,23 +95,24 @@ def repack_wallpapers():
                 {
                     "success": True,
                     "message": "Wallpapers repacked successfully",
-                    "output": result.stdout,
                 }
             )
         else:
+            app.logger.error(f"Repack failed: {result.stderr}")
             return jsonify(
                 {
                     "success": False,
                     "message": "Failed to repack wallpapers",
-                    "error": result.stderr,
                 }
             ), 500
 
     except subprocess.TimeoutExpired:
+        app.logger.error("Repacking timed out")
         return jsonify({"success": False, "message": "Repacking timed out"}), 500
     except Exception as e:
+        app.logger.error(f"Error repacking wallpapers: {str(e)}")
         return jsonify(
-            {"success": False, "message": f"Error repacking wallpapers: {str(e)}"}
+            {"success": False, "message": "An error occurred while repacking wallpapers"}
         ), 500
 
 
@@ -119,9 +121,34 @@ def contact():
     """Handle contact form submissions"""
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({"success": False, "message": "No data provided"}), 400
+
         name = data.get("name")
         email = data.get("email")
         message = data.get("message")
+
+        # Basic validation
+        if not name or not email or not message:
+            return (
+                jsonify({"success": False, "message": "All fields are required"}),
+                400,
+            )
+
+        # Email validation
+        email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        if not re.match(email_regex, email):
+            return (
+                jsonify({"success": False, "message": "Invalid email address"}),
+                400,
+            )
+
+        # Length validation to prevent DoS/overflow
+        if len(name) > 100 or len(email) > 100 or len(message) > 5000:
+            return (
+                jsonify({"success": False, "message": "Input exceeds maximum length"}),
+                400,
+            )
 
         # Here you would typically send an email or save to database
         # For now, we'll just return a success response
@@ -133,6 +160,7 @@ def contact():
             }
         )
     except Exception as e:
+        app.logger.error(f"Contact form error: {str(e)}")
         return jsonify(
             {
                 "success": False,
@@ -558,6 +586,24 @@ def not_found(error):
 def internal_error(error):
     """Handle 500 errors"""
     return render_template("500.html"), 500
+
+
+@app.after_request
+def add_security_headers(response):
+    """Add security headers to all responses"""
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    # Content Security Policy - allow self and necessary CDNs
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdn.jsdelivr.net cdnjs.cloudflare.com; "
+        "style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.tailwindcss.com; "
+        "font-src 'self' fonts.gstatic.com; "
+        "img-src 'self' data:;"
+    )
+    return response
 
 
 # Context processors to make data available to all templates
