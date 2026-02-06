@@ -17,11 +17,16 @@ _PACKS_CACHE = None
 _PACKS_CACHE_TIME = 0
 _CACHE_DURATION = 300  # 5 minutes
 
+# 🛡️ Sentinel: Rate limiting for contact form
+_CONTACT_LIMITS = {}
+
 # Configuration
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 if not app.config["SECRET_KEY"]:
     raise ValueError("No SECRET_KEY set for Flask application")
 app.config["DEBUG"] = os.environ.get("FLASK_ENV") == "development"
+# 🛡️ Sentinel: Limit maximum content length to 1MB to prevent large payload DoS attacks
+app.config["MAX_CONTENT_LENGTH"] = 1024 * 1024
 
 
 @app.route("/")
@@ -119,6 +124,20 @@ def repack_wallpapers():
 @app.route("/api/contact", methods=["POST"])
 def contact():
     """Handle contact form submissions"""
+    # 🛡️ Sentinel: Simple IP-based rate limiting to prevent spam
+    ip = request.remote_addr
+    now = time.time()
+    # Clean up old entries (older than 1 hour)
+    _CONTACT_LIMITS[ip] = [t for t in _CONTACT_LIMITS.get(ip, []) if now - t < 3600]
+    if len(_CONTACT_LIMITS[ip]) >= 5:
+        return (
+            jsonify(
+                {"success": False, "message": "Too many requests. Please try again later."}
+            ),
+            429,
+        )
+    _CONTACT_LIMITS[ip].append(now)
+
     try:
         data = request.get_json()
         if not data:
@@ -601,7 +620,9 @@ def add_security_headers(response):
         "script-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdn.jsdelivr.net cdnjs.cloudflare.com; "
         "style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.tailwindcss.com; "
         "font-src 'self' fonts.gstatic.com; "
-        "img-src 'self' data:;"
+        "img-src 'self' data:; "
+        "object-src 'none'; "
+        "base-uri 'self';"
     )
     return response
 
