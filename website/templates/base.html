@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <title>HueSurf</title>
+        <title>{% block title %}HueSurf{% endblock %}</title>
 
         <!-- JetBrains Mono from Google Fonts (weights used: 300 light, 800 extra-bold) -->
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -97,8 +97,12 @@
             a.button:focus-visible {
                 opacity: 0.9;
                 transform: translateY(-2px);
+            }
+
+            /* Global focus styles for accessibility */
+            :focus-visible {
                 outline: 2px solid var(--fg);
-                outline-offset: 2px;
+                outline-offset: 4px;
             }
 
             /* Subtle caption */
@@ -118,9 +122,11 @@
                     background: transparent;
                 }
             }
+            {% block extra_css %}{% endblock %}
         </style>
     </head>
     <body>
+        {% block content %}
         <main class="wrap" role="main">
             <h1 class="title" aria-label="HueSurf">
                 <span class="hue">Hue</span><span class="surf">Surf</span>
@@ -168,9 +174,11 @@
             </nav>
 
             <p class="meta">
-                A lightweight chromium based browser without ad's, ai, sponsors,
+                A lightweight chromium based browser without ads, ai, sponsors,
                 or bloat.
             </p>
         </main>
+        {% endblock %}
+        {% block extra_js %}{% endblock %}
     </body>
 </html>
