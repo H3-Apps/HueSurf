@@ -194,11 +194,7 @@ def _scan_wallpaper_packs(wallpapers_dir):
                         pass
 
                 # Count wallpapers in pack
-                wallpaper_count = len(
-                    list(pack_dir.glob("*.png"))
-                    + list(pack_dir.glob("*.jpg"))
-                    + list(pack_dir.glob("*.jpeg"))
-                )
+                wallpaper_count = len(_get_images_in_pack(pack_dir))
 
                 # Calculate pack size
                 pack_size = sum(
@@ -423,9 +419,13 @@ def get_wallpaper_preview(pack_name):
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
         # Find first image file
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images = list(pack_dir.glob(f"*{ext}"))
-            if images:
+        images = _get_images_in_pack(pack_dir)
+        if images:
+            # Get the extension from the Path object
+            ext = images[0].suffix.lower()
+            # Check against a safelist of extensions
+            if ext in [".png", ".jpg", ".jpeg", ".webp"]:
+                # The mimetype needs the extension without the dot
                 return send_file(images[0], mimetype=f"image/{ext[1:]}")
 
         abort(404, description="No preview available")
@@ -521,6 +521,17 @@ def get_single_wallpaper(pack_name, filename):
         ), 500
 
 
+# ⚡ Bolt: Cache the image list per pack to avoid expensive filesystem scans on every request.
+# Impact: Reduces response time for this endpoint significantly after the first hit.
+@lru_cache(maxsize=32)
+def _get_images_in_pack(pack_dir):
+    """Helper to get all images in a pack directory."""
+    images = []
+    for ext in [".png", ".jpg", ".jpeg", ".webp"]:
+        images.extend(list(pack_dir.glob(f"*{ext}")))
+    return images
+
+
 @app.route("/api/wallpapers/shuffle/<pack_name>")
 def get_random_wallpaper(pack_name):
     """Get a random wallpaper from the specified pack"""
@@ -537,9 +548,7 @@ def get_random_wallpaper(pack_name):
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
         # Find all image files
-        images = []
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images.extend(list(pack_dir.glob(f"*{ext}")))
+        images = _get_images_in_pack(pack_dir)
 
         if not images:
             abort(404, description="No wallpapers found in pack")
