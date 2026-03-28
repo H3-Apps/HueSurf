@@ -122,6 +122,13 @@
                 cursor: pointer;
                 transition: all 0.3s ease;
                 border: 2px solid #4b5563;
+                padding: 0;
+            }
+
+            .toggle-switch:focus-visible {
+                outline: 2px solid #dc2626;
+                outline-offset: 4px;
+                box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
             }
 
             .toggle-switch.active {
@@ -301,12 +308,16 @@
                                         >Shuffle on New Tab</span
                                     >
                                 </div>
-                                <div
+                                <button
+                                    type="button"
                                     class="toggle-switch"
                                     id="global-shuffle-toggle"
+                                    role="switch"
+                                    aria-checked="true"
+                                    aria-label="Toggle shuffle on new tab"
                                 >
                                     <div class="toggle-slider"></div>
-                                </div>
+                                </button>
                             </div>
                             <p class="text-gray-400 text-sm">
                                 Automatically change wallpapers when opening new
@@ -330,9 +341,16 @@
                                         >Remember Wallpaper</span
                                     >
                                 </div>
-                                <div class="toggle-switch" id="remember-toggle">
+                                <button
+                                    type="button"
+                                    class="toggle-switch"
+                                    id="remember-toggle"
+                                    role="switch"
+                                    aria-checked="false"
+                                    aria-label="Toggle remember last wallpaper"
+                                >
                                     <div class="toggle-slider"></div>
-                                </div>
+                                </button>
                             </div>
                             <p class="text-gray-400 text-sm">
                                 Keep your last selected wallpaper across
@@ -517,6 +535,7 @@
                             document.getElementById("global-shuffle");
                         checkbox.checked = !checkbox.checked;
                         this.classList.toggle("active", checkbox.checked);
+                        this.setAttribute("aria-checked", checkbox.checked.toString());
                         localStorage.setItem("globalShuffle", checkbox.checked);
                         showNotification(
                             `Shuffle ${checkbox.checked ? "enabled" : "disabled"}`,
@@ -531,6 +550,7 @@
                             document.getElementById("remember-wallpaper");
                         checkbox.checked = !checkbox.checked;
                         this.classList.toggle("active", checkbox.checked);
+                        this.setAttribute("aria-checked", checkbox.checked.toString());
                         localStorage.setItem(
                             "rememberWallpaper",
                             checkbox.checked,
@@ -554,12 +574,13 @@
                 document.getElementById("remember-wallpaper").checked =
                     rememberWallpaper;
 
-                document
-                    .getElementById("global-shuffle-toggle")
-                    .classList.toggle("active", globalShuffle);
-                document
-                    .getElementById("remember-toggle")
-                    .classList.toggle("active", rememberWallpaper);
+                const shuffleToggle = document.getElementById("global-shuffle-toggle");
+                shuffleToggle.classList.toggle("active", globalShuffle);
+                shuffleToggle.setAttribute("aria-checked", globalShuffle.toString());
+
+                const rememberToggle = document.getElementById("remember-toggle");
+                rememberToggle.classList.toggle("active", rememberWallpaper);
+                rememberToggle.setAttribute("aria-checked", rememberWallpaper.toString());
             }
 
             // Load wallpaper packs
@@ -995,6 +1016,7 @@
                 searchToggle.className = "btn btn-outline-light btn-sm";
                 searchToggle.innerHTML = '<i class="fas fa-search"></i>';
                 searchToggle.title = "Toggle Search";
+                searchToggle.setAttribute("aria-label", "Toggle search");
 
                 searchToggle.addEventListener("click", function () {
                     const isVisible = searchInput.style.display !== "none";
