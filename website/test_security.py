@@ -78,3 +78,33 @@ def test_contact_validation_length(client):
     })
     assert response.status_code == 400
     assert "exceeds" in response.get_json()["message"]
+
+def test_contact_rate_limiting(client):
+    """Test that the contact endpoint enforces rate limits"""
+    # Import the limits dict to clear it before testing
+    from website.app import _CONTACT_LIMITS
+    _CONTACT_LIMITS.clear()
+
+    payload = {
+        "name": "Test User",
+        "email": "test@example.com",
+        "message": "This is a test message"
+    }
+
+    # Make 5 successful requests
+    for _ in range(5):
+        response = client.post("/api/contact", json=payload)
+        assert response.status_code == 200
+
+    # The 6th request should be rate limited (429)
+    response = client.post("/api/contact", json=payload)
+    assert response.status_code == 429
+    assert response.get_json()["success"] is False
+    assert "Too many requests" in response.get_json()["message"]
+
+def test_csp_header_hardening(client):
+    """Test that hardened CSP headers are present"""
+    response = client.get("/")
+    csp = response.headers.get("Content-Security-Policy", "")
+    assert "object-src 'none'" in csp
+    assert "base-uri 'self'" in csp
