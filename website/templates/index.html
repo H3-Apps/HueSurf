@@ -93,9 +93,11 @@
             a.button:active {
                 transform: translateY(1px) scale(0.997);
             }
-            a.button:hover {
+            a.button:hover, a.button:focus-visible {
                 opacity: 0.9;
                 transform: translateY(-2px);
+                outline: 2px solid var(--fg);
+                outline-offset: 2px;
             }
 
             /* Subtle caption */
@@ -164,7 +166,7 @@
             </nav>
 
             <p class="meta">
-                A lightweight chromium based browser without ad's, ai, sponsors,
+                A lightweight chromium based browser without ads, ai, sponsors,
                 or bloat.
             </p>
         </main>
