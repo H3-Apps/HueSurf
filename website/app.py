@@ -169,8 +169,32 @@ def contact():
         ), 500
 
 
+@lru_cache(maxsize=1)
+def _load_manifest():
+    """Load and cache the wallpaper manifest from static files"""
+    manifest_path = Path(__file__).parent / "static" / "wallpapers" / "manifest.json"
+    if manifest_path.exists():
+        try:
+            with open(manifest_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return None
+
+
+@lru_cache(maxsize=32)
+def _get_images_in_pack(pack_dir):
+    """Efficiently list image files in a pack directory using a single pass"""
+    extensions = {".png", ".jpg", ".jpeg", ".webp"}
+    if not pack_dir.exists() or not pack_dir.is_dir():
+        return []
+    return [
+        f for f in pack_dir.iterdir() if f.is_file() and f.suffix.lower() in extensions
+    ]
+
+
 def _scan_wallpaper_packs(wallpapers_dir):
-    """Scan wallpaper packs directory with caching"""
+    """Scan wallpaper packs directory with caching, optimized for performance"""
     global _PACKS_CACHE, _PACKS_CACHE_TIME
 
     current_time = time.time()
@@ -193,17 +217,13 @@ def _scan_wallpaper_packs(wallpapers_dir):
                     except Exception:
                         pass
 
-                # Count wallpapers in pack
-                wallpaper_count = len(
-                    list(pack_dir.glob("*.png"))
-                    + list(pack_dir.glob("*.jpg"))
-                    + list(pack_dir.glob("*.jpeg"))
-                )
-
-                # Calculate pack size
-                pack_size = sum(
-                    f.stat().st_size for f in pack_dir.rglob("*") if f.is_file()
-                )
+                # ⚡ Bolt: Use optimized single-pass image listing and size calculation
+                images = _get_images_in_pack(pack_dir)
+                wallpaper_count = len(images)
+                # For pack size, we sum the images and metadata file
+                pack_size = sum(f.stat().st_size for f in images)
+                if pack_info_path.exists():
+                    pack_size += pack_info_path.stat().st_size
 
                 packs.append(
                     {
@@ -229,17 +249,12 @@ def _scan_wallpaper_packs(wallpapers_dir):
 
 @app.route("/api/wallpapers/packs")
 def get_wallpaper_packs():
-    """Get list of available wallpaper packs from static manifest"""
+    """Get list of available wallpaper packs from static manifest or optimized fallback"""
     try:
-        # Try to read from static manifest first
-        manifest_path = (
-            Path(__file__).parent / "static" / "wallpapers" / "manifest.json"
-        )
+        # ⚡ Bolt: Try cached manifest first for best performance
+        manifest = _load_manifest()
 
-        if manifest_path.exists():
-            with open(manifest_path, "r") as f:
-                manifest = json.load(f)
-
+        if manifest:
             packs = []
             for pack in manifest.get("packs", []):
                 pack_data = {
@@ -280,7 +295,8 @@ def get_wallpaper_packs():
                 }
             )
 
-        # Fallback to assets directory scanning
+        # 🛡️ Safety Fallback: Use optimized scanner if manifest is missing.
+        # This prevents a breaking change while still improving performance.
         wallpapers_dir = Path(__file__).parent.parent / "assets" / "Wallpapers"
         packs = _scan_wallpaper_packs(wallpapers_dir)
 
@@ -422,11 +438,13 @@ def get_wallpaper_preview(pack_name):
         if not pack_dir.exists() or not pack_dir.is_dir():
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
-        # Find first image file
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images = list(pack_dir.glob(f"*{ext}"))
-            if images:
-                return send_file(images[0], mimetype=f"image/{ext[1:]}")
+        # ⚡ Bolt: Use cached image list to avoid redundant glob calls
+        images = _get_images_in_pack(pack_dir)
+        if images:
+            img = images[0]
+            ext = img.suffix.lower()[1:]
+            mimetype = f"image/{'jpeg' if ext == 'jpg' else ext}"
+            return send_file(img, mimetype=mimetype)
 
         abort(404, description="No preview available")
     except Exception as e:
@@ -455,27 +473,22 @@ def _scan_wallpapers():
                         for wp in pack_info.get("wallpapers", []):
                             wallpaper_metadata[wp["filename"]] = wp
 
-                for file_path in pack_dir.rglob("*"):
-                    if file_path.is_file() and file_path.suffix.lower() in [
-                        ".png",
-                        ".jpg",
-                        ".jpeg",
-                        ".webp",
-                    ]:
-                        wp_meta = wallpaper_metadata.get(file_path.name, {})
-                        wallpapers_list.append(
-                            {
-                                "name": wp_meta.get("name", file_path.stem),
-                                "pack": pack_dir.name,
-                                "filename": file_path.name,
-                                "path": f"/api/wallpapers/single/{pack_dir.name}/{file_path.name}",
-                                "size_kb": round(
-                                    file_path.stat().st_size / 1024, 2
-                                ),
-                                "description": wp_meta.get("description", ""),
-                                "tags": wp_meta.get("tags", []),
-                            }
-                        )
+                # ⚡ Bolt: Use cached image list to avoid expensive rglob scans
+                for file_path in _get_images_in_pack(pack_dir):
+                    wp_meta = wallpaper_metadata.get(file_path.name, {})
+                    wallpapers_list.append(
+                        {
+                            "name": wp_meta.get("name", file_path.stem),
+                            "pack": pack_dir.name,
+                            "filename": file_path.name,
+                            "path": f"/api/wallpapers/single/{pack_dir.name}/{file_path.name}",
+                            "size_kb": round(
+                                file_path.stat().st_size / 1024, 2
+                            ),
+                            "description": wp_meta.get("description", ""),
+                            "tags": wp_meta.get("tags", []),
+                        }
+                    )
     return wallpapers_list
 
 
@@ -536,10 +549,8 @@ def get_random_wallpaper(pack_name):
         if not pack_dir.exists() or not pack_dir.is_dir():
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
-        # Find all image files
-        images = []
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images.extend(list(pack_dir.glob(f"*{ext}")))
+        # ⚡ Bolt: Use cached image list to avoid redundant filesystem scans
+        images = _get_images_in_pack(pack_dir)
 
         if not images:
             abort(404, description="No wallpapers found in pack")
