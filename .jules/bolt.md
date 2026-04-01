@@ -1,0 +1,3 @@
+## 2025-02-12 - Single-pass directory scanning and manifest caching
+**Learning:** Multiple calls to `Path.glob()` and `Path.rglob()` on the same directory trigger redundant filesystem traversals. Using `Path.iterdir()` for a single pass to collect all necessary data (file counts, sizes, extensions) is significantly more efficient. Caching the results with `@lru_cache` further eliminates I/O overhead for static or stable assets.
+**Action:** Always prefer a single `iterdir()` pass over multiple `glob()` calls when scanning a directory for multiple patterns or properties. Wrap these operations in cached helper functions if the data is frequently accessed and relatively static.

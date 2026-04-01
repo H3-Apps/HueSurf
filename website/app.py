@@ -169,6 +169,21 @@ def contact():
         ), 500
 
 
+@lru_cache(maxsize=32)
+def _get_images_in_pack(pack_dir_path):
+    """Helper to get all image files in a pack directory using a single pass, cached."""
+    pack_dir = Path(pack_dir_path)
+    if not pack_dir.exists() or not pack_dir.is_dir():
+        return []
+
+    valid_extensions = {".png", ".jpg", ".jpeg", ".webp"}
+    images = []
+    for f in pack_dir.iterdir():
+        if f.is_file() and f.suffix.lower() in valid_extensions:
+            images.append(f)
+    return images
+
+
 def _scan_wallpaper_packs(wallpapers_dir):
     """Scan wallpaper packs directory with caching"""
     global _PACKS_CACHE, _PACKS_CACHE_TIME
@@ -193,17 +208,17 @@ def _scan_wallpaper_packs(wallpapers_dir):
                     except Exception:
                         pass
 
-                # Count wallpapers in pack
-                wallpaper_count = len(
-                    list(pack_dir.glob("*.png"))
-                    + list(pack_dir.glob("*.jpg"))
-                    + list(pack_dir.glob("*.jpeg"))
-                )
+                # ⚡ Bolt: Single pass to count wallpapers and calculate size
+                wallpaper_count = 0
+                pack_size = 0
+                valid_extensions = {".png", ".jpg", ".jpeg", ".webp"}
 
-                # Calculate pack size
-                pack_size = sum(
-                    f.stat().st_size for f in pack_dir.rglob("*") if f.is_file()
-                )
+                for f in pack_dir.iterdir():
+                    if f.is_file():
+                        f_stat = f.stat()
+                        pack_size += f_stat.st_size
+                        if f.suffix.lower() in valid_extensions:
+                            wallpaper_count += 1
 
                 packs.append(
                     {
@@ -227,19 +242,27 @@ def _scan_wallpaper_packs(wallpapers_dir):
     return packs
 
 
+@lru_cache(maxsize=1)
+def _load_manifest():
+    """Load wallpaper manifest from static file, cached."""
+    manifest_path = Path(__file__).parent / "static" / "wallpapers" / "manifest.json"
+    if manifest_path.exists():
+        try:
+            with open(manifest_path, "r") as f:
+                return json.load(f)
+        except Exception:
+            return None
+    return None
+
+
 @app.route("/api/wallpapers/packs")
 def get_wallpaper_packs():
     """Get list of available wallpaper packs from static manifest"""
     try:
-        # Try to read from static manifest first
-        manifest_path = (
-            Path(__file__).parent / "static" / "wallpapers" / "manifest.json"
-        )
+        # ⚡ Bolt: Use cached manifest loader to avoid repeated disk I/O and JSON parsing
+        manifest = _load_manifest()
 
-        if manifest_path.exists():
-            with open(manifest_path, "r") as f:
-                manifest = json.load(f)
-
+        if manifest:
             packs = []
             for pack in manifest.get("packs", []):
                 pack_data = {
@@ -334,16 +357,11 @@ def download_wallpaper_pack(pack_name):
             ) as tmp_file:
                 temp_zip_path = Path(tmp_file.name)
                 with zipfile.ZipFile(tmp_file, "w", zipfile.ZIP_DEFLATED) as zipf:
-                    # Add all image files from the pack
-                    for file_path in pack_dir.rglob("*"):
-                        if file_path.is_file() and file_path.suffix.lower() in [
-                            ".png",
-                            ".jpg",
-                            ".jpeg",
-                            ".webp",
-                        ]:
-                            arcname = f"{pack_name}/{file_path.relative_to(pack_dir)}"
-                            zipf.write(file_path, arcname)
+                    # ⚡ Bolt: Use cached image list
+                    images = _get_images_in_pack(str(pack_dir))
+                    for file_path in images:
+                        arcname = f"{pack_name}/{file_path.relative_to(pack_dir)}"
+                        zipf.write(file_path, arcname)
 
                     # Add metadata
                     pack_info_path = pack_dir / "pack_info.json"
@@ -358,11 +376,7 @@ def download_wallpaper_pack(pack_name):
                             "description": f"{pack_name} wallpaper pack for HueSurf browser",
                             "shuffle_enabled": True,
                             "shuffle_on_new_tab": True,
-                            "count": len(
-                                list(pack_dir.glob("*.png"))
-                                + list(pack_dir.glob("*.jpg"))
-                                + list(pack_dir.glob("*.jpeg"))
-                            ),
+                            "count": len(images),
                             "settings": {
                                 "shuffle_interval": "new_tab",
                                 "transition_effect": "fade",
@@ -536,10 +550,8 @@ def get_random_wallpaper(pack_name):
         if not pack_dir.exists() or not pack_dir.is_dir():
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
-        # Find all image files
-        images = []
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images.extend(list(pack_dir.glob(f"*{ext}")))
+        # ⚡ Bolt: Use cached single-pass scanner to avoid multiple glob() hits
+        images = _get_images_in_pack(str(pack_dir))
 
         if not images:
             abort(404, description="No wallpapers found in pack")
