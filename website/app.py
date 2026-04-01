@@ -5,6 +5,10 @@ import re
 from pathlib import Path
 import tempfile
 import time
+import random
+import subprocess
+import sys
+import mimetypes
 from functools import lru_cache
 
 from flask import Flask, render_template, request, jsonify, send_file, abort
@@ -16,6 +20,16 @@ app = Flask(__name__)
 _PACKS_CACHE = None
 _PACKS_CACHE_TIME = 0
 _CACHE_DURATION = 300  # 5 minutes
+
+
+@lru_cache(maxsize=1)
+def _load_manifest(manifest_path):
+    """Helper to load and cache the wallpaper manifest"""
+    if manifest_path.exists():
+        with open(manifest_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return None
+
 
 # Configuration
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
@@ -78,9 +92,6 @@ def repack_wallpapers():
     if not app.config["DEBUG"]:
         abort(403)
     try:
-        import subprocess
-        import sys
-
         # Run the packer script
         script_path = Path(__file__).parent.parent / "scripts" / "pack_wallpapers.py"
         result = subprocess.run(
@@ -91,6 +102,15 @@ def repack_wallpapers():
         )
 
         if result.returncode == 0:
+            # Clear all wallpaper related caches
+            _load_manifest.cache_clear()
+            _get_images_in_pack.cache_clear()
+            _scan_wallpapers.cache_clear()
+            get_all_wallpapers.cache_clear()
+
+            global _PACKS_CACHE
+            _PACKS_CACHE = None
+
             return jsonify(
                 {
                     "success": True,
@@ -156,7 +176,10 @@ def contact():
         return jsonify(
             {
                 "success": True,
-                "message": "Thanks for reaching out! We'll get back to you soon (unless Javier's robot took over).",
+                "message": (
+                    "Thanks for reaching out! We'll get back to you soon "
+                    "(unless Javier's robot took over)."
+                ),
             }
         )
     except Exception as e:
@@ -167,6 +190,21 @@ def contact():
                 "message": "Oops! Something went wrong. Please try again or hit us up on GitHub.",
             }
         ), 500
+
+
+@lru_cache(maxsize=64)
+def _get_images_in_pack(pack_dir):
+    """Get all images in a pack and calculate total size in one pass, cached."""
+    images = []
+    total_size = 0
+    if pack_dir.exists():
+        for f in pack_dir.rglob("*"):
+            if f.is_file():
+                size = f.stat().st_size
+                total_size += size
+                if f.suffix.lower() in [".png", ".jpg", ".jpeg", ".webp"]:
+                    images.append((f, size))
+    return tuple(images), total_size
 
 
 def _scan_wallpaper_packs(wallpapers_dir):
@@ -193,24 +231,15 @@ def _scan_wallpaper_packs(wallpapers_dir):
                     except Exception:
                         pass
 
-                # Count wallpapers in pack
-                wallpaper_count = len(
-                    list(pack_dir.glob("*.png"))
-                    + list(pack_dir.glob("*.jpg"))
-                    + list(pack_dir.glob("*.jpeg"))
-                )
-
-                # Calculate pack size
-                pack_size = sum(
-                    f.stat().st_size for f in pack_dir.rglob("*") if f.is_file()
-                )
+                # Get wallpapers and pack size in a single pass
+                images, total_size = _get_images_in_pack(pack_dir)
 
                 packs.append(
                     {
                         "id": pack_dir.name.lower().replace(" ", "_"),
                         "name": pack_dir.name,
-                        "count": wallpaper_count,
-                        "size_mb": round(pack_size / (1024 * 1024), 2),
+                        "count": len(images),
+                        "size_mb": round(total_size / (1024 * 1024), 2),
                         "preview": f"/api/wallpapers/preview/{pack_dir.name}",
                         "description": pack_info.get(
                             "description", "Wallpaper pack for HueSurf browser"
@@ -235,10 +264,9 @@ def get_wallpaper_packs():
         manifest_path = (
             Path(__file__).parent / "static" / "wallpapers" / "manifest.json"
         )
+        manifest = _load_manifest(manifest_path)
 
-        if manifest_path.exists():
-            with open(manifest_path, "r") as f:
-                manifest = json.load(f)
+        if manifest:
 
             packs = []
             for pack in manifest.get("packs", []):
@@ -335,20 +363,15 @@ def download_wallpaper_pack(pack_name):
                 temp_zip_path = Path(tmp_file.name)
                 with zipfile.ZipFile(tmp_file, "w", zipfile.ZIP_DEFLATED) as zipf:
                     # Add all image files from the pack
-                    for file_path in pack_dir.rglob("*"):
-                        if file_path.is_file() and file_path.suffix.lower() in [
-                            ".png",
-                            ".jpg",
-                            ".jpeg",
-                            ".webp",
-                        ]:
-                            arcname = f"{pack_name}/{file_path.relative_to(pack_dir)}"
-                            zipf.write(file_path, arcname)
+                    images, _ = _get_images_in_pack(pack_dir)
+                    for file_path, _ in images:
+                        arcname = f"{pack_name}/{file_path.relative_to(pack_dir)}"
+                        zipf.write(file_path, arcname)
 
                     # Add metadata
                     pack_info_path = pack_dir / "pack_info.json"
                     if pack_info_path.exists():
-                        with open(pack_info_path, "r") as f:
+                        with open(pack_info_path, "r", encoding="utf-8") as f:
                             metadata = json.load(f)
                     else:
                         metadata = {
@@ -358,11 +381,7 @@ def download_wallpaper_pack(pack_name):
                             "description": f"{pack_name} wallpaper pack for HueSurf browser",
                             "shuffle_enabled": True,
                             "shuffle_on_new_tab": True,
-                            "count": len(
-                                list(pack_dir.glob("*.png"))
-                                + list(pack_dir.glob("*.jpg"))
-                                + list(pack_dir.glob("*.jpeg"))
-                            ),
+                            "count": len(images),
                             "settings": {
                                 "shuffle_interval": "new_tab",
                                 "transition_effect": "fade",
@@ -423,10 +442,11 @@ def get_wallpaper_preview(pack_name):
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
         # Find first image file
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images = list(pack_dir.glob(f"*{ext}"))
-            if images:
-                return send_file(images[0], mimetype=f"image/{ext[1:]}")
+        images, _ = _get_images_in_pack(pack_dir)
+        if images:
+            preview_image = images[0][0]
+            mimetype, _ = mimetypes.guess_type(str(preview_image))
+            return send_file(preview_image, mimetype=mimetype or "image/jpeg")
 
         abort(404, description="No preview available")
     except Exception as e:
@@ -455,27 +475,20 @@ def _scan_wallpapers():
                         for wp in pack_info.get("wallpapers", []):
                             wallpaper_metadata[wp["filename"]] = wp
 
-                for file_path in pack_dir.rglob("*"):
-                    if file_path.is_file() and file_path.suffix.lower() in [
-                        ".png",
-                        ".jpg",
-                        ".jpeg",
-                        ".webp",
-                    ]:
-                        wp_meta = wallpaper_metadata.get(file_path.name, {})
-                        wallpapers_list.append(
-                            {
-                                "name": wp_meta.get("name", file_path.stem),
-                                "pack": pack_dir.name,
-                                "filename": file_path.name,
-                                "path": f"/api/wallpapers/single/{pack_dir.name}/{file_path.name}",
-                                "size_kb": round(
-                                    file_path.stat().st_size / 1024, 2
-                                ),
-                                "description": wp_meta.get("description", ""),
-                                "tags": wp_meta.get("tags", []),
-                            }
-                        )
+                images, _ = _get_images_in_pack(pack_dir)
+                for file_path, size in images:
+                    wp_meta = wallpaper_metadata.get(file_path.name, {})
+                    wallpapers_list.append(
+                        {
+                            "name": wp_meta.get("name", file_path.stem),
+                            "pack": pack_dir.name,
+                            "filename": file_path.name,
+                            "path": f"/api/wallpapers/single/{pack_dir.name}/{file_path.name}",
+                            "size_kb": round(size / 1024, 2),
+                            "description": wp_meta.get("description", ""),
+                            "tags": wp_meta.get("tags", []),
+                        }
+                    )
     return wallpapers_list
 
 
@@ -528,8 +541,6 @@ def get_random_wallpaper(pack_name):
         # 🛡️ Sanitize user input to prevent path traversal
         pack_name = secure_filename(pack_name)
 
-        import random
-
         wallpapers_dir = Path(__file__).parent.parent / "assets" / "Wallpapers"
         pack_dir = wallpapers_dir / pack_name
 
@@ -537,21 +548,19 @@ def get_random_wallpaper(pack_name):
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
         # Find all image files
-        images = []
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images.extend(list(pack_dir.glob(f"*{ext}")))
+        images, _ = _get_images_in_pack(pack_dir)
 
         if not images:
             abort(404, description="No wallpapers found in pack")
 
         # Select random wallpaper
-        random_image = random.choice(images)
+        random_image, _ = random.choice(images)
 
         # Read pack info for metadata
         pack_info_path = pack_dir / "pack_info.json"
         wallpaper_meta = {}
         if pack_info_path.exists():
-            with open(pack_info_path, "r") as f:
+            with open(pack_info_path, "r", encoding="utf-8") as f:
                 pack_info = json.load(f)
                 for wp in pack_info.get("wallpapers", []):
                     if wp["filename"] == random_image.name:
@@ -598,7 +607,8 @@ def add_security_headers(response):
     # Content Security Policy - allow self and necessary CDNs
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdn.jsdelivr.net cdnjs.cloudflare.com; "
+        "script-src 'self' 'unsafe-inline' cdn.tailwindcss.com "
+        "cdn.jsdelivr.net cdnjs.cloudflare.com; "
         "style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.tailwindcss.com; "
         "font-src 'self' fonts.gstatic.com; "
         "img-src 'self' data:;"
@@ -611,7 +621,9 @@ def add_security_headers(response):
 def inject_globals():
     return {
         "app_name": "HueSurf",
-        "tagline": "A lightweight Chromium-based browser without ADs, AI, Sponsors, or bloat.",
+        "tagline": (
+            "A lightweight Chromium-based browser without ADs, AI, Sponsors, or bloat."
+        ),
         "version": "0.1.0-dev",
         "github_url": "https://github.com/H3-Apps/HueSurf",
         "team_members": ["H3", "vexalous", "i love pand ass"],
