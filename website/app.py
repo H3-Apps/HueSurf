@@ -521,6 +521,22 @@ def get_single_wallpaper(pack_name, filename):
         ), 500
 
 
+@lru_cache(maxsize=32)
+def _get_images_in_pack(pack_name):
+    """Helper to scan a pack directory for images and cache the results."""
+    wallpapers_dir = Path(__file__).parent.parent / "assets" / "Wallpapers"
+    pack_dir = wallpapers_dir / pack_name
+
+    if not pack_dir.is_dir():
+        # This will be cached, so an empty list indicates a pack not found.
+        return []
+
+    images = []
+    for ext in [".png", ".jpg", ".jpeg", ".webp"]:
+        images.extend(pack_dir.glob(f"*{ext}"))
+    return images
+
+
 @app.route("/api/wallpapers/shuffle/<pack_name>")
 def get_random_wallpaper(pack_name):
     """Get a random wallpaper from the specified pack"""
@@ -530,24 +546,19 @@ def get_random_wallpaper(pack_name):
 
         import random
 
-        wallpapers_dir = Path(__file__).parent.parent / "assets" / "Wallpapers"
-        pack_dir = wallpapers_dir / pack_name
-
-        if not pack_dir.exists() or not pack_dir.is_dir():
-            abort(404, description=f"Wallpaper pack '{pack_name}' not found")
-
-        # Find all image files
-        images = []
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images.extend(list(pack_dir.glob(f"*{ext}")))
+        # ⚡ Bolt: Use the cached helper to get the image list, avoiding a slow filesystem scan.
+        # This is significantly faster on subsequent requests for the same pack.
+        images = _get_images_in_pack(pack_name)
 
         if not images:
-            abort(404, description="No wallpapers found in pack")
+            abort(404, description=f"Wallpaper pack '{pack_name}' not found or is empty")
 
         # Select random wallpaper
         random_image = random.choice(images)
 
         # Read pack info for metadata
+        # The pack_dir can be derived from the Path object of the selected image
+        pack_dir = random_image.parent
         pack_info_path = pack_dir / "pack_info.json"
         wallpaper_meta = {}
         if pack_info_path.exists():
