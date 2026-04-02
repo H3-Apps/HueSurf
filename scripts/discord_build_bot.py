@@ -249,9 +249,10 @@ async def build_progress_command(
         return
 
     # Validate build command/file exists
+    loop = asyncio.get_running_loop()
     if log_file:
         log_path = f"../{log_file}"
-        if not os.path.exists(log_path):
+        if not await loop.run_in_executor(None, os.path.exists, log_path):
             await interaction.response.send_message(
                 f"❌ Log file not found: {log_file}", ephemeral=True
             )
@@ -259,7 +260,7 @@ async def build_progress_command(
         build_command = f"tail -f {log_file}"
     else:
         script_path = f"../{command}"
-        if not os.path.exists(script_path):
+        if not await loop.run_in_executor(None, os.path.exists, script_path):
             await interaction.response.send_message(
                 f"❌ Build script not found: {command}\n"
                 f"Make sure the script exists in the HueSurf directory.",
