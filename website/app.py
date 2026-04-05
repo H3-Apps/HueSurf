@@ -396,6 +396,38 @@ def download_wallpaper_pack(pack_name):
         ), 500
 
 
+def _find_preview_image(pack_dir):
+    """Find the best preview image in a pack directory."""
+    best_match = None
+    best_priority = 5
+
+    try:
+        with os.scandir(pack_dir) as it:
+            for entry in it:
+                if entry.is_file():
+                    name_lower = entry.name.lower()
+                    if name_lower.endswith(".png"):
+                        # Priority 1: found best possible, return immediately
+                        return entry.path
+
+                    if name_lower.endswith(".jpg"):
+                        if best_priority > 2:
+                            best_match = entry.path
+                            best_priority = 2
+                    elif name_lower.endswith(".jpeg"):
+                        if best_priority > 3:
+                            best_match = entry.path
+                            best_priority = 3
+                    elif name_lower.endswith(".webp"):
+                        if best_priority > 4:
+                            best_match = entry.path
+                            best_priority = 4
+    except OSError:
+        pass
+
+    return best_match
+
+
 @app.route("/api/wallpapers/preview/<pack_name>")
 def get_wallpaper_preview(pack_name):
     """Get preview image for a wallpaper pack"""
@@ -423,10 +455,12 @@ def get_wallpaper_preview(pack_name):
             abort(404, description=f"Wallpaper pack '{pack_name}' not found")
 
         # Find first image file
-        for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-            images = list(pack_dir.glob(f"*{ext}"))
-            if images:
-                return send_file(images[0], mimetype=f"image/{ext[1:]}")
+        # ⚡ Bolt: optimized lookup to avoid multiple globs
+        best_match = _find_preview_image(pack_dir)
+
+        if best_match:
+            ext = os.path.splitext(best_match)[1].lower()
+            return send_file(best_match, mimetype=f"image/{ext[1:]}")
 
         abort(404, description="No preview available")
     except Exception as e:
